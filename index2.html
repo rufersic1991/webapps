@@ -128,38 +128,255 @@
         <h2>Actividades Desconectadas</h2>
         <div class="card mb-3">
             <div class="card-body">
-                <h5 class="card-title">La Carta</h5>
+                <h5 class="card-title">La Carta de Mis Emociones</h5>
                 <p class="card-text">Actividad para reflexionar sobre las virtudes y desafíos personales mediante cartas.</p>
-                <button onclick="alert('Instrucciones detalladas para la actividad de La Carta')" class="btn btn-primary">Descubre cómo hacerlo</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCarta">
+                    Descubre cómo hacerlo
+                </button>
             </div>
         </div>
         <div class="card mb-3">
             <div class="card-body">
                 <h5 class="card-title">El Semáforo</h5>
                 <p class="card-text">Aprende a manejar las emociones y reacciones con esta actividad práctica.</p>
-                <button onclick="alert('Instrucciones para realizar la actividad El Semáforo')" class="btn btn-primary">Descubre cómo hacerlo</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSemaforo">
+                    Descubre cómo hacerlo
+                </button>
             </div>
         </div>
     </section>
 
+    <!-- Modal para la actividad "La Carta" -->
+    <div class="modal fade" id="modalCarta" tabindex="-1" aria-labelledby="modalCartaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCartaLabel">Actividad: La Carta de Mis Emociones</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><b>Objetivo:</b> Reflexionar sobre las emociones, virtudes y desafíos personales, promoviendo el autoconocimiento, la empatía y la resolución pacífica de conflictos entre los estudiantes.</p>
+                    <p><b>Materiales necesarios:</b></p>
+                    <ul>
+                        <li>Hojas de papel (tamaño carta o más pequeño).</li>
+                        <li>Lápices o crayones.</li>
+                        <li>Sobres pequeños (opcional, para guardar las cartas).</li>
+                        <li>Una caja decorada (para depositar las cartas).</li>
+                    </ul>
+                    <p><b>Instrucciones:</b></p>
+                    <ol>
+                        <li><b>Introducción (5 minutos):</b> El docente explica a los estudiantes que van a escribir una carta especial sobre sus emociones, virtudes y desafíos. Se puede usar un ejemplo sencillo: "Hoy me sentí feliz cuando jugué con mis amigos, pero me enojé cuando no me escucharon. Quiero aprender a escuchar mejor a los demás". Se enfatiza que no es necesario que los niños sepan escribir perfectamente; pueden dibujar o pedir ayuda al docente si lo necesitan.</li>
+                        <li><b>Escritura o dibujo de la carta (15 minutos):</b> Cada estudiante recibe una hoja de papel y lápices o crayones. Se les pide que piensen en:
+                            <ul>
+                                <li>Una emoción que sintieron durante el día (alegría, tristeza, enojo, etc.).</li>
+                                <li>Una virtud que tienen (por ejemplo, ser amables, ayudar a los demás, ser creativos).</li>
+                                <li>Un desafío que enfrentan (por ejemplo, controlar el enojo, compartir, escuchar a los demás).</li>
+                            </ul>
+                            Los estudiantes pueden escribir o dibujar sus respuestas. Por ejemplo:
+                            <ul>
+                                <li>Dibujar una cara feliz para representar la alegría.</li>
+                                <li>Escribir una frase como: "Soy bueno para ayudar a mis amigos".</li>
+                                <li>Dibujar una situación que les cause enojo o tristeza.</li>
+                            </ul>
+                        </li>
+                        <li><b>Compartir en grupo (10 minutos):</b> Los estudiantes depositan sus cartas en una caja decorada (puede ser una "Caja de las Emociones"). El docente saca algunas cartas al azar y las lee en voz alta (sin revelar el nombre del autor). Se invita a los estudiantes a reflexionar sobre las emociones y desafíos compartidos, y a proponer soluciones o ideas para manejar esas situaciones.</li>
+                        <li><b>Reflexión final (5 minutos):</b> El docente guía una breve reflexión sobre lo aprendido:
+                            <ul>
+                                <li>¿Qué emociones son más comunes en el grupo?</li>
+                                <li>¿Cómo podemos ayudarnos mutuamente a manejar los desafíos?</li>
+                                <li>¿Qué virtudes podemos usar para resolver conflictos?</li>
+                            </ul>
+                            Se enfatiza la importancia de expresar las emociones y trabajar juntos para mejorar la convivencia.
+                        </li>
+                    </ol>
+                    <p><b>Relación con el proyecto de investigación:</b></p>
+                    <ul>
+                        <li><b>Manejo de emociones:</b> La actividad fomenta que los estudiantes identifiquen y expresen sus emociones, lo que es clave para el desarrollo de habilidades socioemocionales.</li>
+                        <li><b>Resolución de conflictos:</b> Al compartir sus desafíos y escuchar a los demás, los niños aprenden a empatizar y proponer soluciones pacíficas.</li>
+                        <li><b>Uso de recursos sencillos:</b> Al ser una actividad desconectada, se adapta al contexto rural con limitaciones tecnológicas, utilizando materiales básicos como papel y lápices.</li>
+                    </ul>
+                    <p><b>Variantes de la actividad:</b></p>
+                    <ul>
+                        <li><b>Carta a un amigo:</b> Los estudiantes pueden escribir o dibujar una carta para un compañero, destacando una virtud que admiren en él o ella.</li>
+                        <li><b>Carta futura:</b> Los niños pueden escribir una carta para su "yo del futuro", expresando cómo quieren manejar sus emociones y desafíos en el futuro.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para la actividad "El Semáforo" -->
+    <div class="modal fade" id="modalSemaforo" tabindex="-1" aria-labelledby="modalSemaforoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalSemaforoLabel">Actividad: El Semáforo de las Emociones</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><b>Objetivo:</b> Enseñar a los niños a identificar y manejar sus emociones utilizando el modelo del semáforo (rojo, amarillo, verde), promoviendo la autorregulación emocional y la resolución pacífica de conflictos.</p>
+                    <p><b>Materiales necesarios:</b></p>
+                    <ul>
+                        <li>Tarjetas o papel de colores (rojo, amarillo, verde).</li>
+                        <li>Lápices o marcadores.</li>
+                        <li>Una cartulina grande para crear un semáforo (opcional).</li>
+                        <li>Pegamento o cinta adhesiva.</li>
+                    </ul>
+                    <p><b>Instrucciones:</b></p>
+                    <ol>
+                        <li><b>Introducción (5 minutos):</b> El docente explica el concepto del semáforo de las emociones:
+                            <ul>
+                                <li><b>Rojo:</b> Detente. Cuando sientes una emoción fuerte (como enojo o frustración), debes parar y no actuar de inmediato.</li>
+                                <li><b>Amarillo:</b> Piensa. Reflexiona sobre lo que estás sintiendo y por qué.</li>
+                                <li><b>Verde:</b> Actúa. Toma una decisión calmada y positiva para resolver la situación.</li>
+                            </ul>
+                            Se puede usar un ejemplo: "Si alguien te quita un juguete, en lugar de gritar (rojo), piensa en cómo resolverlo (amarillo) y habla con tu compañero (verde)".
+                        </li>
+                        <li><b>Creación del semáforo (10 minutos):</b> Los estudiantes reciben tarjetas o papel de colores (rojo, amarillo, verde). En cada tarjeta, escriben o dibujan:
+                            <ul>
+                                <li><b>Rojo:</b> Una emoción fuerte (enojo, tristeza, frustración).</li>
+                                <li><b>Amarillo:</b> Una forma de reflexionar (respirar profundamente, contar hasta 10, pensar en soluciones).</li>
+                                <li><b>Verde:</b> Una acción positiva (hablar con calma, pedir ayuda, compartir).</li>
+                            </ul>
+                            Si se usa una cartulina grande, los estudiantes pueden pegar sus tarjetas en un semáforo dibujado.
+                        </li>
+                        <li><b>Práctica en grupo (15 minutos):</b> El docente presenta situaciones hipotéticas (por ejemplo, "Alguien te empuja en el recreo" o "No te dejan jugar"). Los estudiantes identifican qué color del semáforo aplicarían en cada caso y explican cómo manejarían la situación. Se fomenta la discusión grupal sobre las emociones y las soluciones propuestas.</li>
+                        <li><b>Reflexión final (5 minutos):</b> El docente guía una breve reflexión:
+                            <ul>
+                                <li>¿Qué emociones son más difíciles de manejar?</li>
+                                <li>¿Cómo podemos ayudarnos mutuamente a usar el semáforo de las emociones?</li>
+                            </ul>
+                            Se enfatiza la importancia de detenerse, pensar y actuar de manera positiva.
+                        </li>
+                    </ol>
+                    <p><b>Relación con el proyecto de investigación:</b></p>
+                    <ul>
+                        <li><b>Manejo de emociones:</b> La actividad enseña a los niños a identificar y regular sus emociones, clave para el desarrollo de habilidades socioemocionales.</li>
+                        <li><b>Resolución de conflictos:</b> Al practicar el modelo del semáforo, los estudiantes aprenden a resolver conflictos de manera pacífica y constructiva.</li>
+                        <li><b>Uso de recursos sencillos:</b> Al ser una actividad desconectada, se adapta al contexto rural con limitaciones tecnológicas, utilizando materiales básicos como papel y colores.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Sección Historias -->
-    <section id="historias" class="container fun-section">
-        <h2>Historias y Cuentos</h2>
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">El Misterio del Lápiz Perdido</h5>
-                <p class="card-text">Una historia sobre aprender a no hacer acusaciones precipitadas.</p>
-                <button onclick="alert('Reflexiona sobre cómo resolver conflictos a través de este cuento')" class="btn btn-primary">Leer más</button>
+   <!-- Sección Historias -->
+<
+<!-- Sección Historias -->
+<section id="historias" class="container fun-section">
+    <h2>Historias y Cuentos</h2>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">El Misterio del Lápiz Perdido</h5>
+            <p class="card-text">Una historia sobre aprender a no hacer acusaciones precipitadas.</p>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalLapiz">
+                Leer más
+            </button>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">La Caja de la Amistad</h5>
+            <p class="card-text">Fomentar la inclusión y la empatía con propuestas de actividades.</p>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCajaAmistad">
+                Leer más
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Modal para la historia "El Misterio del Lápiz Perdido" -->
+<div class="modal fade" id="modalLapiz" tabindex="-1" aria-labelledby="modalLapizLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLapizLabel">El Misterio del Lápiz Perdido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><b>Historia:</b></p>
+                <p>
+                    Había una vez en la escuela de la vereda Mote, un niño llamado Lucas. Lucas era muy organizado y siempre cuidaba sus útiles escolares. Un día, después del recreo, Lucas notó que su lápiz favorito, el que tenía un diseño de superhéroe, había desaparecido.
+                </p>
+                <p>
+                    "¡Alguien me robó mi lápiz!", gritó Lucas, mirando a sus compañeros con desconfianza. "¡Seguro fue Pedro! Siempre está jugando con mis cosas".
+                </p>
+                <p>
+                    Pedro, al escuchar la acusación, se sintió muy triste. "No fui yo, Lucas. Yo no tomé tu lápiz", dijo con voz temblorosa.
+                </p>
+                <p>
+                    La maestra, al ver la situación, decidió intervenir. "Lucas, antes de acusar a alguien, es importante asegurarnos de lo que pasó. ¿Has revisado bien tu mochila y tu pupitre?"
+                </p>
+                <p>
+                    Lucas, aunque enojado, siguió el consejo de la maestra. Al revisar su mochila, encontró el lápiz escondido entre sus cuadernos. Resulta que, en su prisa por salir al recreo, lo había guardado sin darse cuenta.
+                </p>
+                <p>
+                    Lucas se sintió avergonzado. "Lo siento, Pedro. No debí acusarte sin saber la verdad", dijo con sinceridad.
+                </p>
+                <p>
+                    Pedro sonrió y respondió: "No pasa nada, Lucas. Lo importante es que encontramos tu lápiz y aprendimos a no hacer acusaciones precipitadas".
+                </p>
+                <p>
+                    Desde ese día, Lucas y Pedro se convirtieron en mejores amigos, y todos en la clase aprendieron la importancia de pensar antes de actuar y de resolver los conflictos con calma y diálogo.
+                </p>
+                <p><b>Mensaje:</b></p>
+                <p>
+                    Esta historia nos enseña la importancia de no hacer acusaciones precipitadas y de resolver los conflictos con calma y diálogo. Antes de culpar a alguien, es importante asegurarnos de lo que realmente sucedió.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">La Caja de la Amistad</h5>
-                <p class="card-text">Fomentar la inclusión y la empatía con propuestas de actividades.</p>
-                <button onclick="alert('Aprende más sobre cómo ser un mejor amigo')" class="btn btn-primary">Leer más</button>
+    </div>
+</div>
+
+<!-- Modal para la historia "La Caja de la Amistad" -->
+<div class="modal fade" id="modalCajaAmistad" tabindex="-1" aria-labelledby="modalCajaAmistadLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCajaAmistadLabel">La Caja de la Amistad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><b>Historia:</b></p>
+                <p>
+                    En la escuela de la vereda Mote, había una niña llamada Sofía. Sofía era nueva en la clase y se sentía un poco sola porque no conocía a nadie. Un día, la maestra trajo una caja decorada con colores brillantes y la colocó en un rincón del salón.
+                </p>
+                <p>
+                    "Esta es la Caja de la Amistad", dijo la maestra. "Cada uno de ustedes puede escribir o dibujar algo bonito para un compañero y colocarlo en la caja. Al final del día, repartiremos los mensajes".
+                </p>
+                <p>
+                    Los niños se emocionaron con la idea. Sofía, aunque tímida, decidió participar. Escribió un mensaje para Pedro, diciendo: "Me gusta cómo juegas fútbol en el recreo". Pedro, al recibir el mensaje, se sintió muy feliz y le devolvió un dibujo a Sofía con un corazón y las palabras: "Gracias, Sofía. Eres muy amable".
+                </p>
+                <p>
+                    Poco a poco, la Caja de la Amistad se llenó de mensajes y dibujos. Los niños comenzaron a conocerse mejor y a compartir más entre ellos. Sofía ya no se sentía sola, porque había hecho nuevos amigos gracias a los mensajes de la caja.
+                </p>
+                <p>
+                    Un día, la maestra preguntó: "¿Qué han aprendido con la Caja de la Amistad?". Los niños respondieron: "Aprendimos a ser más amables", "Aprendimos a incluir a todos" y "Aprendimos que un pequeño gesto puede hacer feliz a alguien".
+                </p>
+                <p>
+                    Desde entonces, la Caja de la Amistad se convirtió en una tradición en la clase, recordándoles a todos la importancia de la empatía y la inclusión.
+                </p>
+                <p><b>Mensaje:</b></p>
+                <p>
+                    Esta historia nos enseña la importancia de la empatía, la inclusión y los pequeños gestos que pueden hacer una gran diferencia en la vida de los demás. La Caja de la Amistad es una herramienta sencilla pero poderosa para fomentar la conexión y el respeto entre los compañeros.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
-    </section>
+    </div>
+</div>
 
     <!-- Sección Videos -->
     <section id="videos" class="container fun-section">
@@ -173,10 +390,11 @@
         </div>
     </section>
 
-    <!-- Pie de página con información del autor y licencia -->
+    <!-- Pie de página -->
     <footer class="footer">
         <div class="container">
-            <p>© 2024 Creado por <strong>Angie Caucil</strong>. Este trabajo está bajo una <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Licencia Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional</a>.</p>
+            <p>© 2024 Creado por <strong>Angie Caucil</strong>.
+                Este trabajo está bajo una <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">Licencia Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional</a>.</p>
         </div>
     </footer>
 
