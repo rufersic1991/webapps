@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unidad Didáctica - Resolución de Conflictos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .modal-content {
+            border-radius: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: black;
+        }
+        .btn-custom {
+            background: #FFD700;
+            color: black;
+            font-weight: bold;
+            border-radius: 10px;
+            padding: 10px 20px;
+            transition: 0.3s;
+        }
+        .btn-custom:hover {
+            background: #FFA500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container animate__animated animate__fadeIn">
+        <h1 class="title">Secuencia Didáctica</h1>
+        <table class="table table-bordered text-white">
+            <tr><th colspan="2">DATOS GENERALES</th></tr>
+            <tr><td><strong>Título de la Secuencia Didáctica:</strong></td><td>Resolución de Conflictos y Manejo de Emociones</td></tr>
+            <tr><td><strong>Institución Educativa:</strong></td><td>Institución Educativa Palo Blanco</td></tr>
+            <tr><td><strong>Municipio:</strong></td><td>Ituango</td></tr>
+            <tr><td><strong>Departamento:</strong></td><td>Antioquia</td></tr>
+            <tr><td><strong>Área de Conocimiento:</strong></td><td>Educación Socioemocional</td></tr>
+            <tr><td><strong>Tema:</strong></td><td>Manejo de emociones y resolución de conflictos</td></tr>
+            <tr><td><strong>Grado:</strong></td><td>Preescolar a Cuarto</td></tr>
+            <tr><td><strong>Tiempo:</strong></td><td>8 sesiones</td></tr>
+            <tr><td colspan="2"><strong>Descripción de la Secuencia:</strong><br>Se propone una secuencia didáctica para fortalecer las habilidades socioemocionales de los estudiantes a través de actividades gamificadas mediante el uso de un blog interactivo, promoviendo la resolución de conflictos y el manejo de emociones en un entorno escolar.</td></tr>
+            <tr><th colspan="2">OBJETIVOS, COMPETENCIAS Y CONTENIDOS</th></tr>
+            <tr><td><strong>Objetivo de Aprendizaje:</strong></td><td>Desarrollar habilidades para la resolución pacífica de conflictos y el manejo de emociones mediante herramientas digitales.</td></tr>
+            <tr><td><strong>Contenidos a Desarrollar:</strong></td><td>Estrategias de resolución de conflictos, inteligencia emocional y regulación emocional en el aula.</td></tr>
+        </table>
+
+        <h2 class="mt-4">Actividades</h2>
+        <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#modalActividad1">Actividad 1: La Carta de Mis Emociones</button>
+        <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#modalActividad2">Actividad 2: El Semáforo de las Emociones</button>
+    </div>
+
+    <!-- Modal Actividad 1 -->
+    <div class="modal fade" id="modalActividad1" tabindex="-1" aria-labelledby="modalActividad1Label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalActividad1Label">La Carta de Mis Emociones</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <strong>Inicio:</strong> Explicación de la actividad y propósito.<br>
+                    <strong>Desarrollo:</strong> Escritura o dibujo de una carta sobre emociones, virtudes y desafíos, fomentando la autorreflexión y empatía.<br>
+                    <strong>Finalización:</strong> Lectura anónima de algunas cartas, compartiendo experiencias y promoviendo un espacio seguro de expresión.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Actividad 2 -->
+    <div class="modal fade" id="modalActividad2" tabindex="-1" aria-labelledby="modalActividad2Label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalActividad2Label">El Semáforo de las Emociones</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <strong>Inicio:</strong> Explicación del modelo del semáforo para manejar emociones.<br>
+                    <strong>Desarrollo:</strong> Creación de tarjetas de colores y análisis de situaciones para aprender a gestionar emociones de manera adecuada.<br>
+                    <strong>Finalización:</strong> Reflexión grupal sobre cómo aplicar la técnica en la vida diaria, fomentando estrategias de autorregulación.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5">
+        <p>Para más información, visita el blog completo: <a href="https://rufersic1991.github.io/webapps/index2.html" target="_blank" style="color: yellow; text-decoration: underline;">Ver Blog</a></p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
