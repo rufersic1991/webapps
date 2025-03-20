@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Usuario</title>
+  <style>
+    /* Fondo degradado impactante */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #FF7E5F, #feb47b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin: 15px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    .result, .noEncontrado {
+      margin-top: 20px;
+      text-align: left;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    .noEncontrado {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Consulta de Usuario</h1>
+    <p>Ingresa tu documento:</p>
+    <input type="text" id="documentInput" placeholder="Documento">
+    <button onclick="buscarUsuario()">Buscar</button>
+    
+    <div id="result" class="result" style="display:none;">
+      <h2>Información del Usuario</h2>
+      <p><strong>Nombre:</strong> <span id="nombre"></span></p>
+      <p><strong>Usuario:</strong> <span id="usuario"></span></p>
+      <p><strong>Contraseña:</strong> <span id="contraseña"></span></p>
+    </div>
+    <div id="noEncontrado" class="noEncontrado" style="display:none;">
+      Usuario no encontrado.
+    </div>
+  </div>
+
+  <script>
+    // JSON generado, incluido directamente en el código
+    var datos = [
+  {
+    "Documento": "1063792820",
+    "Nombre del Estudiante": "ACUÑA PEREZ ZOE",
+    "Usuario": "1002800101",
+    "Clave": "1063792820"
+  },
+  {
+    "Documento": "1063792700",
+    "Nombre del Estudiante": "ARCIA VEGA IZAM",
+    "Usuario": "1002800102",
+    "Clave": "1063792700"
+  },
+  {
+    "Documento": "1063368866",
+    "Nombre del Estudiante": "ARIAS SIERRA MATEO",
+    "Usuario": "1002800103",
+    "Clave": "1063368866"
+  },
+  {
+    "Documento": "1062988196",
+    "Nombre del Estudiante": "DIAZ MADRID VALENTINA",
+    "Usuario": "1002800104",
+    "Clave": "1062988196"
+  },
+  {
+    "Documento": "1063792622",
+    "Nombre del Estudiante": "FERRER ROMERO CELESTE",
+    "Usuario": "1002800105",
+    "Clave": "1063792622"
+  },
+  {
+    "Documento": "1063368896",
+    "Nombre del Estudiante": "MAZO HENAO VICTORIA",
+    "Usuario": "1002800106",
+    "Clave": "1063368896"
+  },
+  {
+    "Documento": "1063368903",
+    "Nombre del Estudiante": "MERCADO GONZALEZ EMMANUEL",
+    "Usuario": "1002800107",
+    "Clave": "1063368903"
+  },
+  {
+    "Documento": "1066608570",
+    "Nombre del Estudiante": "MORENO SALGADO YISETH",
+    "Usuario": "1002800108",
+    "Clave": "1066608570"
+  },
+  {
+    "Documento": "1063792643",
+    "Nombre del Estudiante": "MORENO SALGADO THIAGO",
+    "Usuario": "1002800109",
+    "Clave": "1063792643"
+  },
+  {
+    "Documento": "1119412256",
+    "Nombre del Estudiante": "PITRE OCHOA MAIA",
+    "Usuario": "1002800110",
+    "Clave": "1119412256"
+  },
+  {
+    "Documento": "1063792519",
+    "Nombre del Estudiante": "PRASCA ARRIETA JOSUE",
+    "Usuario": "1002800111",
+    "Clave": "1063792519"
+  },
+  {
+    "Documento": "1074137380",
+    "Nombre del Estudiante": "TENORIO LOZANO ALAN IKER",
+    "Usuario": "1002800112",
+    "Clave": "1074137380"
+  },
+  {
+    "Documento": "1062544911",
+    "Nombre del Estudiante": "VERGARA ALDANA NAHIA",
+    "Usuario": "1002800113",
+    "Clave": "1062544911"
+  },
+  {
+    "Documento": "1063792618",
+    "Nombre del Estudiante": "ZABALA PARRA PABLO",
+    "Usuario": "1002800114",
+    "Clave": "1063792618"
+  },
+  {
+    "Documento": "1063368757",
+    "Nombre del Estudiante": "ARBALEDA DE LA HOZ JHOSEPH",
+    "Usuario": "1002801101",
+    "Clave": "1063368757"
+  },
+  {
+    "Documento": "1038144479",
+    "Nombre del Estudiante": "BRAVO MONTOYA JORDANIS",
+    "Usuario": "1002801102",
+    "Clave": "1038144479"
+  },
+  {
+    "Documento": "1136033034",
+    "Nombre del Estudiante": "ESCOBAR SIERRA JERONIMO",
+    "Usuario": "1002801103",
+    "Clave": "1136033034"
+  },
+  {
+    "Documento": "1063368682",
+    "Nombre del Estudiante": "GIRALDO ZEMANATE GABRIELA",
+    "Usuario": "1002801104",
+    "Clave": "1063368682"
+  },
+  {
+    "Documento": "1104386549",
+    "Nombre del Estudiante": "HERNANDEZ CASTILLEJO THALIANA",
+    "Usuario": "1002801105",
+    "Clave": "1104386549"
+  },
+  {
+    "Documento": "1063368719",
+    "Nombre del Estudiante": "MARTINEZ MARTINEZ LUCENA",
+    "Usuario": "1002801106",
+    "Clave": "1063368719"
+  },
+  {
+    "Documento": "1063368572",
+    "Nombre del Estudiante": "MERCADO MUÑOZ KATERIN",
+    "Usuario": "1002801107",
+    "Clave": "1063368572"
+  },
+  {
+    "Documento": "1063792579",
+    "Nombre del Estudiante": "MORALES AVILES MATIAS",
+    "Usuario": "1002801108",
+    "Clave": "1063792579"
+  },
+  {
+    "Documento": "1063792322",
+    "Nombre del Estudiante": "ORTIZ CERPA EIMY",
+    "Usuario": "1002801109",
+    "Clave": "1063792322"
+  },
+  {
+    "Documento": "1063368566",
+    "Nombre del Estudiante": "OSORIO GONZALEZ EMMA",
+    "Usuario": "1002801110",
+    "Clave": "1063368566"
+  },
+  {
+    "Documento": "1063368562",
+    "Nombre del Estudiante": "PEREZ RODRIGUEZ VALERY SOFIA",
+    "Usuario": "1002801111",
+    "Clave": "1063368562"
+  },
+  {
+    "Documento": "1063792291",
+    "Nombre del Estudiante": "PINEDA RICARDO LIA",
+    "Usuario": "1002801112",
+    "Clave": "1063792291"
+  },
+  {
+    "Documento": "1063368463",
+    "Nombre del Estudiante": "QUIÑONES ROMERO MANUEL",
+    "Usuario": "1002801113",
+    "Clave": "1063368463"
+  },
+  {
+    "Documento": "1069508879",
+    "Nombre del Estudiante": "SIERRA SOLANO RUBEN ALEJANDRO",
+    "Usuario": "1002801114",
+    "Clave": "1069508879"
+  },
+  {
+    "Documento": "1063792535",
+    "Nombre del Estudiante": "SUAREZ MENDOZA GERONIMO",
+    "Usuario": "1002801115",
+    "Clave": "1063792535"
+  },
+  {
+    "Documento": "1062542468",
+    "Nombre del Estudiante": "SUAREZ URANGO DYLAN JOSE",
+    "Usuario": "1002801116",
+    "Clave": "1062542468"
+  },
+  {
+    "Documento": "1063368381",
+    "Nombre del Estudiante": "VALDEZ CORONADO CATALINA",
+    "Usuario": "1002801117",
+    "Clave": "1063368381"
+  },
+  {
+    "Documento": "1063368840",
+    "Nombre del Estudiante": "VARGAS JARAMILLO LUCIA",
+    "Usuario": "1002801118",
+    "Clave": "1063368840"
+  },
+  {
+    "Documento": "1138033070",
+    "Nombre del Estudiante": "VELEZ ARROYO SALMA",
+    "Usuario": "1002801119",
+    "Clave": "1138033070"
+  },
+  {
+    "Documento": "1063310386",
+    "Nombre del Estudiante": "ALEJANDRO MORALES OCHOA",
+    "Usuario": "1002802101",
+    "Clave": "1063310386"
+  },
+  {
+    "Documento": "1063368076",
+    "Nombre del Estudiante": "ANA SOFIA SANCHEZ VILORIA",
+    "Usuario": "1002802102",
+    "Clave": "1063368076"
+  },
+  {
+    "Documento": "1063368058",
+    "Nombre del Estudiante": "ARAMI SOPHIA ALTAMIRANDA MARTINEZ",
+    "Usuario": "1002802103",
+    "Clave": "1063368058"
+  },
+  {
+    "Documento": "1066608012",
+    "Nombre del Estudiante": "DANIEL ANDRES GOMEZ OJEDA",
+    "Usuario": "1002802104",
+    "Clave": "1066608012"
+  },
+  {
+    "Documento": "1063368092",
+    "Nombre del Estudiante": "GABRIELA GIRALDO CERMEÑO",
+    "Usuario": "1002802105",
+    "Clave": "1063368092"
+  },
+  {
+    "Documento": "1063368044",
+    "Nombre del Estudiante": "HELLEN MERCADO HERRERA",
+    "Usuario": "1002802106",
+    "Clave": "1063368044"
+  },
+  {
+    "Documento": "1017941620",
+    "Nombre del Estudiante": "ISAAC OCHOA ACUÑA",
+    "Usuario": "1002802107",
+    "Clave": "1017941620"
+  },
+  {
+    "Documento": "1063368432",
+    "Nombre del Estudiante": "ISAIAS PADILLA VERGARA",
+    "Usuario": "1002802108",
+    "Clave": "1063368432"
+  },
+  {
+    "Documento": "1063793213",
+    "Nombre del Estudiante": "IVAN MEJIA JARAMILLO",
+    "Usuario": "1002802109",
+    "Clave": "1063793213"
+  },
+  {
+    "Documento": "1063791830",
+    "Nombre del Estudiante": "JERONIMO SUAREZ CHICA",
+    "Usuario": "1002802110",
+    "Clave": "1063791830"
+  },
+  {
+    "Documento": "1063368131",
+    "Nombre del Estudiante": "JHOJAN YESID SALGADO MARTINEZ",
+    "Usuario": "1002802111",
+    "Clave": "1063368131"
+  },
+  {
+    "Documento": "1063368307",
+    "Nombre del Estudiante": "JHON ALEX GIL AVILES",
+    "Usuario": "1002802112",
+    "Clave": "1063368307"
+  },
+  {
+    "Documento": "1067635281",
+    "Nombre del Estudiante": "JORGE MARIO BARRIOS MUÑOZ",
+    "Usuario": "1002802113",
+    "Clave": "1067635281"
+  },
+  {
+    "Documento": "1038141454",
+    "Nombre del Estudiante": "LIAM MUÑOZ ROMERO",
+    "Usuario": "1002802114",
+    "Clave": "1038141454"
+  },
+  {
+    "Documento": "1125005260",
+    "Nombre del Estudiante": "MARIA ISSABEL ZUÑIGA HERAZO",
+    "Usuario": "1002802115",
+    "Clave": "1125005260"
+  },
+  {
+    "Documento": "1063368311",
+    "Nombre del Estudiante": "MARIANA MEZA COGOLLO",
+    "Usuario": "1002802116",
+    "Clave": "1063368311"
+  },
+  {
+    "Documento": "1062540061",
+    "Nombre del Estudiante": "MATIAS PEREZ CUADRADO",
+    "Usuario": "1002802117",
+    "Clave": "1062540061"
+  },
+  {
+    "Documento": "1141136729",
+    "Nombre del Estudiante": "MATIAS DE LA OSSA SAN MIGUEL",
+    "Usuario": "1002802118",
+    "Clave": "1141136729"
+  },
+  {
+    "Documento": "1023540408",
+    "Nombre del Estudiante": "MATIAS GALVIS RENDON",
+    "Usuario": "1002802119",
+    "Clave": "1023540408"
+  },
+  {
+    "Documento": "1063368130",
+    "Nombre del Estudiante": "MELANIE JIMENEZ MADERA",
+    "Usuario": "1002802120",
+    "Clave": "1063368130"
+  },
+  {
+    "Documento": "1063368158",
+    "Nombre del Estudiante": "MILAGRO RUA CONTRERA",
+    "Usuario": "1002802121",
+    "Clave": "1063368158"
+  },
+  {
+    "Documento": "1233345996",
+    "Nombre del Estudiante": "NAOMI HOYOS OVIEDO",
+    "Usuario": "1002802122",
+    "Clave": "1233345996"
+  },
+  {
+    "Documento": "1138032523",
+    "Nombre del Estudiante": "NOAH ISSAC QUIÑONEZ PADILLA",
+    "Usuario": "1002802123",
+    "Clave": "1138032523"
+  },
+  {
+    "Documento": "1063367901",
+    "Nombre del Estudiante": "PABLO DYBALA GONZALEZ MORENO",
+    "Usuario": "1002802124",
+    "Clave": "1063367901"
+  },
+  {
+    "Documento": "1197215698",
+    "Nombre del Estudiante": "PAULINA ESTER POLO GUERRERO",
+    "Usuario": "1002802125",
+    "Clave": "1197215698"
+  },
+  {
+    "Documento": "1063368243",
+    "Nombre del Estudiante": "THIAGO HUERTA MARQUEZ",
+    "Usuario": "1002802126",
+    "Clave": "1063368243"
+  },
+  {
+    "Documento": "1063368034",
+    "Nombre del Estudiante": "VALERIA DE LA OSSA FERNANDEZ",
+    "Usuario": "1002802127",
+    "Clave": "1063368034"
+  },
+  {
+    "Documento": "10637910146",
+    "Nombre del Estudiante": "XILENA MONTIEL PARDO",
+    "Usuario": "1002802128",
+    "Clave": "10637910146"
+  },
+  {
+    "Documento": "1062540641",
+    "Nombre del Estudiante": "ZAMARA VALDERRAMA MUÑOZ",
+    "Usuario": "1002802129",
+    "Clave": "1062540641"
+  },
+  {
+    "Documento": "1063791703",
+    "Nombre del Estudiante": "ADRIANA LUCIA RICARDO DE ORO",
+    "Usuario": "1002803101",
+    "Clave": "1063791703"
+  },
+  {
+    "Documento": "1063367561",
+    "Nombre del Estudiante": "ALAN URZOLA CALONGE",
+    "Usuario": "1002803102",
+    "Clave": "1063367561"
+  },
+  {
+    "Documento": "1063367351",
+    "Nombre del Estudiante": "ASHLEY NICOLL PEREZ ORTEGA",
+    "Usuario": "1002803103",
+    "Clave": "1063367351"
+  },
+  {
+    "Documento": "1233040993",
+    "Nombre del Estudiante": "DYLAN PINEDA FLOREZ",
+    "Usuario": "1002803104",
+    "Clave": "1233040993"
+  },
+  {
+    "Documento": "1063368128",
+    "Nombre del Estudiante": "EMANUEL ACEVEDO BENITEZ",
+    "Usuario": "1002803105",
+    "Clave": "1063368128"
+  },
+  {
+    "Documento": "1044003884",
+    "Nombre del Estudiante": "EMMA LUNA BRACAMONTE VERONA",
+    "Usuario": "1002803106",
+    "Clave": "1044003884"
+  },
+  {
+    "Documento": "1063367504",
+    "Nombre del Estudiante": "EVELYN RICARDO ALEAN",
+    "Usuario": "1002803107",
+    "Clave": "1063367504"
+  },
+  {
+    "Documento": "1063307271",
+    "Nombre del Estudiante": "FADER DAVID MUÑOZ MESTRA",
+    "Usuario": "1002803108",
+    "Clave": "1063307271"
+  },
+  {
+    "Documento": "1123974830",
+    "Nombre del Estudiante": "FREDDY JOSE ARROYO FERNANDEZ",
+    "Usuario": "1002803109",
+    "Clave": "1123974830"
+  },
+  {
+    "Documento": "1063791791",
+    "Nombre del Estudiante": "ISABELLA ZOE ALTAMIRANDA MARTINEZ",
+    "Usuario": "1002803110",
+    "Clave": "1063791791"
+  },
+  {
+    "Documento": "1063791685",
+    "Nombre del Estudiante": "JAIDER PATERNINA HOYOS",
+    "Usuario": "1002803111",
+    "Clave": "1063791685"
+  },
+  {
+    "Documento": "1063308062",
+    "Nombre del Estudiante": "JESUS MANUEL LOPEZ RICARDO",
+    "Usuario": "1002803112",
+    "Clave": "1063308062"
+  },
+  {
+    "Documento": "1063304127",
+    "Nombre del Estudiante": "JOSSER TORRALVO OZUNA",
+    "Usuario": "1002803113",
+    "Clave": "1063304127"
+  },
+  {
+    "Documento": "1063315393",
+    "Nombre del Estudiante": "JUAN CAMILO HERRERA IBAÑEZ",
+    "Usuario": "1002803114",
+    "Clave": "1063315393"
+  },
+  {
+    "Documento": "1063367607",
+    "Nombre del Estudiante": "JUAN ESTEBAN MORA MONTES",
+    "Usuario": "1002803115",
+    "Clave": "1063367607"
+  },
+  {
+    "Documento": "1063791760",
+    "Nombre del Estudiante": "MANUEL ESTEBAN QUINTERO PACHECO",
+    "Usuario": "1002803116",
+    "Clave": "1063791760"
+  },
+  {
+    "Documento": "1063367704",
+    "Nombre del Estudiante": "MARIANA RAMOS JIMENEZ",
+    "Usuario": "1002803117",
+    "Clave": "1063367704"
+  },
+  {
+    "Documento": "1063367266",
+    "Nombre del Estudiante": "ROGERS GUZMAN SEÑA",
+    "Usuario": "1002803118",
+    "Clave": "1063367266"
+  },
+  {
+    "Documento": "1063367467",
+    "Nombre del Estudiante": "ROYNER MIGUEL ARRIETA BUELVAS",
+    "Usuario": "1002803119",
+    "Clave": "1063367467"
+  },
+  {
+    "Documento": "1140444843",
+    "Nombre del Estudiante": "SALEM PASTRANA ROJAS",
+    "Usuario": "1002803120",
+    "Clave": "1140444843"
+  },
+  {
+    "Documento": "1063791809",
+    "Nombre del Estudiante": "SALOME ALVAREZ MORENO",
+    "Usuario": "1002803121",
+    "Clave": "1063791809"
+  },
+  {
+    "Documento": "1063367460",
+    "Nombre del Estudiante": "SAMARA ARIAS SIERRA",
+    "Usuario": "1002803122",
+    "Clave": "1063367460"
+  },
+  {
+    "Documento": "1038140123",
+    "Nombre del Estudiante": "SHEREZADE MUÑOZ PIMIENTA",
+    "Usuario": "1002803123",
+    "Clave": "1038140123"
+  },
+  {
+    "Documento": "1063367350",
+    "Nombre del Estudiante": "ADRIAN MUÑOZ HUERTA",
+    "Usuario": "1002804101",
+    "Clave": "1063367350"
+  },
+  {
+    "Documento": "1063797471",
+    "Nombre del Estudiante": "ADRIANA BUELVAS SEVERICHE",
+    "Usuario": "1002804102",
+    "Clave": "1063797471"
+  },
+  {
+    "Documento": "10633637295",
+    "Nombre del Estudiante": "ANGEL DAVID OSORIO GONZALEZ",
+    "Usuario": "1002804103",
+    "Clave": "10633637295"
+  },
+  {
+    "Documento": "1063366997",
+    "Nombre del Estudiante": "CATTEYA HERRERA REYES",
+    "Usuario": "1002804104",
+    "Clave": "1063366997"
+  },
+  {
+    "Documento": "1062979949",
+    "Nombre del Estudiante": "ELIAM CARO CARDENAS",
+    "Usuario": "1002804105",
+    "Clave": "1062979949"
+  },
+  {
+    "Documento": "1063791741",
+    "Nombre del Estudiante": "EMILIA ARIAS ACUÑA",
+    "Usuario": "1002804106",
+    "Clave": "1063791741"
+  },
+  {
+    "Documento": "1063366832",
+    "Nombre del Estudiante": "ISAAC DAVID MESA PEREZ",
+    "Usuario": "1002804107",
+    "Clave": "1063366832"
+  },
+  {
+    "Documento": "1063791486",
+    "Nombre del Estudiante": "JHOHAN ARBOLEDA DE LA HOZ",
+    "Usuario": "1002804108",
+    "Clave": "1063791486"
+  },
+  {
+    "Documento": "1063367495",
+    "Nombre del Estudiante": "JUAN CARLOS ZARANTE RUBIO",
+    "Usuario": "1002804109",
+    "Clave": "1063367495"
+  },
+  {
+    "Documento": "1023537050",
+    "Nombre del Estudiante": "JUSTIN MUÑOZ REYES",
+    "Usuario": "1002804110",
+    "Clave": "1023537050"
+  },
+  {
+    "Documento": "1063791454",
+    "Nombre del Estudiante": "LUCIANA TEJADA PEREIRA",
+    "Usuario": "1002804111",
+    "Clave": "1063791454"
+  },
+  {
+    "Documento": "1068141097",
+    "Nombre del Estudiante": "LUIS FERNANDO SIERRA SOLANO",
+    "Usuario": "1002804112",
+    "Clave": "1068141097"
+  },
+  {
+    "Documento": "1063366974",
+    "Nombre del Estudiante": "MARIA JOSE VERGARA FONTECHA",
+    "Usuario": "1002804113",
+    "Clave": "1063366974"
+  },
+  {
+    "Documento": "1063367114",
+    "Nombre del Estudiante": "MEELANY PATERNINA URIBE",
+    "Usuario": "1002804114",
+    "Clave": "1063367114"
+  },
+  {
+    "Documento": "1140444162",
+    "Nombre del Estudiante": "SALOME VERGARA RIOS",
+    "Usuario": "1002804115",
+    "Clave": "1140444162"
+  },
+  {
+    "Documento": "1063791406",
+    "Nombre del Estudiante": "SALVADOR MEZA NORIEGA",
+    "Usuario": "1002804116",
+    "Clave": "1063791406"
+  },
+  {
+    "Documento": "1063367491",
+    "Nombre del Estudiante": "SARA SOFIA CHARRI OSORIO",
+    "Usuario": "1002804117",
+    "Clave": "1063367491"
+  },
+  {
+    "Documento": "1063791692",
+    "Nombre del Estudiante": "SEBASTIAN CHARRIS HERNANDEZ",
+    "Usuario": "1002804118",
+    "Clave": "1063791692"
+  },
+  {
+    "Documento": "1063791583",
+    "Nombre del Estudiante": "STIVEN HERNADEZ RAMOS",
+    "Usuario": "1002804119",
+    "Clave": "1063791583"
+  },
+  {
+    "Documento": "1063791514",
+    "Nombre del Estudiante": "VALERIE MORENO GRANJA",
+    "Usuario": "1002804120",
+    "Clave": "1063791514"
+  },
+  {
+    "Documento": "1063366972",
+    "Nombre del Estudiante": "VICTORIA FIGUEROA ROMERO",
+    "Usuario": "1002804121",
+    "Clave": "1063366972"
+  },
+  {
+    "Documento": "1063366961",
+    "Nombre del Estudiante": "VICTORIA SAENZ GOMEZ",
+    "Usuario": "1002804122",
+    "Clave": "1063366961"
+  },
+  {
+    "Documento": "1063791604",
+    "Nombre del Estudiante": "XIMENA NICOL SANMARTIN RIVAS",
+    "Usuario": "1002804123",
+    "Clave": "1063791604"
+  },
+  {
+    "Documento": "1063366071",
+    "Nombre del Estudiante": "ADRIAN ARTEAGA ACOSTA",
+    "Usuario": "1002805101",
+    "Clave": "1063366071"
+  },
+  {
+    "Documento": "1063791277",
+    "Nombre del Estudiante": "ANGEL DAVID RICARDO DE ORO",
+    "Usuario": "1002805102",
+    "Clave": "1063791277"
+  },
+  {
+    "Documento": "1050554224",
+    "Nombre del Estudiante": "CRISTIAN ANDRES MENDOZA MARTINEZ",
+    "Usuario": "1002805103",
+    "Clave": "1050554224"
+  },
+  {
+    "Documento": "1063366461",
+    "Nombre del Estudiante": "ERICK DAVID SEQUEDA ALVAREZ",
+    "Usuario": "1002805104",
+    "Clave": "1063366461"
+  },
+  {
+    "Documento": "1063366534",
+    "Nombre del Estudiante": "HELLEN FLOREZ BENITEZ",
+    "Usuario": "1002805105",
+    "Clave": "1063366534"
+  },
+  {
+    "Documento": "1063791255",
+    "Nombre del Estudiante": "ISABELLA ROMERO HERRERA",
+    "Usuario": "1002805106",
+    "Clave": "1063791255"
+  },
+  {
+    "Documento": "1062533788",
+    "Nombre del Estudiante": "JUAN DAVID ESCOBAR SIERRA",
+    "Usuario": "1002805107",
+    "Clave": "1062533788"
+  },
+  {
+    "Documento": "1068140374",
+    "Nombre del Estudiante": "JUAN DIEGO PATERNINA PINEDO",
+    "Usuario": "1002805108",
+    "Clave": "1068140374"
+  },
+  {
+    "Documento": "1063366107",
+    "Nombre del Estudiante": "LAURA RAMIREZ PINEDA",
+    "Usuario": "1002805109",
+    "Clave": "1063366107"
+  },
+  {
+    "Documento": "1140444065",
+    "Nombre del Estudiante": "LINDA SOFIA CALDERON RAMOS",
+    "Usuario": "1002805110",
+    "Clave": "1140444065"
+  },
+  {
+    "Documento": "1063366512",
+    "Nombre del Estudiante": "LUCAS ADRIAN ASSIA BEDOYA",
+    "Usuario": "1002805111",
+    "Clave": "1063366512"
+  },
+  {
+    "Documento": "1063791085",
+    "Nombre del Estudiante": "LUIS FERNANDO ROJAS MORALES",
+    "Usuario": "1002805112",
+    "Clave": "1063791085"
+  },
+  {
+    "Documento": "1063366491",
+    "Nombre del Estudiante": "LUIS FERNANDO SUAREZ JARAMILLO",
+    "Usuario": "1002805113",
+    "Clave": "1063366491"
+  },
+  {
+    "Documento": "1063366824",
+    "Nombre del Estudiante": "LUIS MARIO MAZO HENAO",
+    "Usuario": "1002805114",
+    "Clave": "1063366824"
+  },
+  {
+    "Documento": "1063366103",
+    "Nombre del Estudiante": "MARIANA PEREZ LOPEZ",
+    "Usuario": "1002805115",
+    "Clave": "1063366103"
+  },
+  {
+    "Documento": "1063366446",
+    "Nombre del Estudiante": "MATEO JOSE RAMIREZ RUA",
+    "Usuario": "1002805116",
+    "Clave": "1063366446"
+  },
+  {
+    "Documento": "1063791291",
+    "Nombre del Estudiante": "NICOLAS CASTRO GARCIA",
+    "Usuario": "1002805117",
+    "Clave": "1063791291"
+  },
+  {
+    "Documento": "1063791336",
+    "Nombre del Estudiante": "OSCAR DAVID PEREZ CHICA",
+    "Usuario": "1002805118",
+    "Clave": "1063791336"
+  },
+  {
+    "Documento": "1063303549",
+    "Nombre del Estudiante": "PALOMA BOTERO HERNADEZ",
+    "Usuario": "1002805119",
+    "Clave": "1063303549"
+  },
+  {
+    "Documento": "1017244142",
+    "Nombre del Estudiante": "SANTIAGO CORREA SIERRA",
+    "Usuario": "1002805120",
+    "Clave": "1017244142"
+  },
+  {
+    "Documento": "1140444259",
+    "Nombre del Estudiante": "SOFIA SANTIS RUBIO",
+    "Usuario": "1002805121",
+    "Clave": "1140444259"
+  },
+  {
+    "Documento": "1138030637",
+    "Nombre del Estudiante": "THIAGO DAVID ZUÑIGA HERAZO",
+    "Usuario": "1002805122",
+    "Clave": "1138030637"
+  },
+  {
+    "Documento": "1063365731",
+    "Nombre del Estudiante": "AKEMY CORTES CARRASCAL",
+    "Usuario": "1002806101",
+    "Clave": "1063365731"
+  },
+  {
+    "Documento": "1062530406",
+    "Nombre del Estudiante": "ALEJANDRO GARAVITO HOYOS",
+    "Usuario": "1002806102",
+    "Clave": "1062530406"
+  },
+  {
+    "Documento": "1063791213",
+    "Nombre del Estudiante": "BERNABE ISAAC PADILLA SUAREZ",
+    "Usuario": "1002806103",
+    "Clave": "1063791213"
+  },
+  {
+    "Documento": "1063365495",
+    "Nombre del Estudiante": "CALEB ZUÑIGA GALLEGO",
+    "Usuario": "1002806104",
+    "Clave": "1063365495"
+  },
+  {
+    "Documento": "1063791128",
+    "Nombre del Estudiante": "CARLOS ELIAS CANOLES CAICEDO",
+    "Usuario": "1002806105",
+    "Clave": "1063791128"
+  },
+  {
+    "Documento": "1016599533",
+    "Nombre del Estudiante": "DULCE MARIA CASTAÑEDA HUMANES",
+    "Usuario": "1002806106",
+    "Clave": "1016599533"
+  },
+  {
+    "Documento": "1063366069",
+    "Nombre del Estudiante": "EMANUEL CHARRI OSORIO",
+    "Usuario": "1002806107",
+    "Clave": "1063366069"
+  },
+  {
+    "Documento": "1062529082",
+    "Nombre del Estudiante": "EMMANUEL RODRIGUEZ OSORIO",
+    "Usuario": "1002806108",
+    "Clave": "1062529082"
+  },
+  {
+    "Documento": "1063302066",
+    "Nombre del Estudiante": "EVOLETH CRISTINA DUQUE ROMERO",
+    "Usuario": "1002806109",
+    "Clave": "1063302066"
+  },
+  {
+    "Documento": "1062529483",
+    "Nombre del Estudiante": "ISABELLA DE LA OSA FERNANDEZ",
+    "Usuario": "1002806110",
+    "Clave": "1062529483"
+  },
+  {
+    "Documento": "1063303246",
+    "Nombre del Estudiante": "ISRAEL DAVID CARCAMO SUAREZ",
+    "Usuario": "1002806111",
+    "Clave": "1063303246"
+  },
+  {
+    "Documento": "1063365948",
+    "Nombre del Estudiante": "JUAN GUILLERMO TORO ALVAREZ",
+    "Usuario": "1002806112",
+    "Clave": "1063365948"
+  },
+  {
+    "Documento": "1100338875",
+    "Nombre del Estudiante": "KAMERLIN ALQUERQUE HERNANDEZ",
+    "Usuario": "1002806113",
+    "Clave": "1100338875"
+  },
+  {
+    "Documento": "1073175440",
+    "Nombre del Estudiante": "LUIS DAVID ROMERO DE LA OSSA",
+    "Usuario": "1002806114",
+    "Clave": "1073175440"
+  },
+  {
+    "Documento": "1138030038",
+    "Nombre del Estudiante": "LUIS SAMUEL ACEVEDO CORDERO",
+    "Usuario": "1002806115",
+    "Clave": "1138030038"
+  },
+  {
+    "Documento": "1068140242",
+    "Nombre del Estudiante": "LUIS SANTIAGO MONTIEL ROMERO",
+    "Usuario": "1002806116",
+    "Clave": "1068140242"
+  },
+  {
+    "Documento": "1063791025",
+    "Nombre del Estudiante": "MARIANA MAYA CHARRIS",
+    "Usuario": "1002806117",
+    "Clave": "1063791025"
+  },
+  {
+    "Documento": "1063364049",
+    "Nombre del Estudiante": "MICHAEL DAVID HUMANEZ HOYOS",
+    "Usuario": "1002806118",
+    "Clave": "1063364049"
+  },
+  {
+    "Documento": "1063365578",
+    "Nombre del Estudiante": "OSCAR IVAN PATERNINA RAMOS",
+    "Usuario": "1002806119",
+    "Clave": "1063365578"
+  },
+  {
+    "Documento": "1063365808",
+    "Nombre del Estudiante": "SALOMON ANDRES SEÑA QUIÑONEZ",
+    "Usuario": "1002806120",
+    "Clave": "1063365808"
+  },
+  {
+    "Documento": "1063365384",
+    "Nombre del Estudiante": "SAMANTA GONZALEZ URBANO",
+    "Usuario": "1002806121",
+    "Clave": "1063365384"
+  },
+  {
+    "Documento": "1040516127",
+    "Nombre del Estudiante": "SAMUEL ACEVEDO BENITEZ",
+    "Usuario": "1002806122",
+    "Clave": "1040516127"
+  },
+  {
+    "Documento": "1068140223",
+    "Nombre del Estudiante": "SARA MICHELLE GOMEZ PINEDO",
+    "Usuario": "1002806123",
+    "Clave": "1068140223"
+  },
+  {
+    "Documento": "1063365353",
+    "Nombre del Estudiante": "SARA SOFIA VERGARA FONTECHA",
+    "Usuario": "1002806124",
+    "Clave": "1063365353"
+  },
+  {
+    "Documento": "1063365308",
+    "Nombre del Estudiante": "SEBASTIAN MESA LOPEZ",
+    "Usuario": "1002806125",
+    "Clave": "1063365308"
+  },
+  {
+    "Documento": "1063791130",
+    "Nombre del Estudiante": "STEPHANY MERCADO HERRERA",
+    "Usuario": "1002806126",
+    "Clave": "1063791130"
+  },
+  {
+    "Documento": "1063300376",
+    "Nombre del Estudiante": "TAYLER JARAMILLO CANTERO",
+    "Usuario": "1002806127",
+    "Clave": "1063300376"
+  },
+  {
+    "Documento": "1063364059",
+    "Nombre del Estudiante": "ALEX MATEO HUERTAS CRESPO",
+    "Usuario": "1002807101",
+    "Clave": "1063364059"
+  },
+  {
+    "Documento": "1063364357",
+    "Nombre del Estudiante": "ANDRES FELIPE SALGADO DE ORO",
+    "Usuario": "1002807102",
+    "Clave": "1063364357"
+  },
+  {
+    "Documento": "1063364287",
+    "Nombre del Estudiante": "ANTHONELLA RUA CONTRERAS",
+    "Usuario": "1002807103",
+    "Clave": "1063364287"
+  },
+  {
+    "Documento": "1063364451",
+    "Nombre del Estudiante": "ELIANA LOPEZ LOPEZ",
+    "Usuario": "1002807104",
+    "Clave": "1063364451"
+  },
+  {
+    "Documento": "1066574757",
+    "Nombre del Estudiante": "ELISA GENES QUINTERO",
+    "Usuario": "1002807105",
+    "Clave": "1066574757"
+  },
+  {
+    "Documento": "1063299929",
+    "Nombre del Estudiante": "EMANUEL FELIPE QUIÑONEZ PADILLA",
+    "Usuario": "1002807106",
+    "Clave": "1063299929"
+  },
+  {
+    "Documento": "1067933382",
+    "Nombre del Estudiante": "EMILY FERNANDEZ SANDOVAL",
+    "Usuario": "1002807107",
+    "Clave": "1067933382"
+  },
+  {
+    "Documento": "1063790863",
+    "Nombre del Estudiante": "ENA LUZ GARCIA AVILA",
+    "Usuario": "1002807108",
+    "Clave": "1063790863"
+  },
+  {
+    "Documento": "1138087699",
+    "Nombre del Estudiante": "GABRIEL EMILIO GONZALEZ ROMERO",
+    "Usuario": "1002807109",
+    "Clave": "1138087699"
+  },
+  {
+    "Documento": "1063790636",
+    "Nombre del Estudiante": "HOYOS MANUELA BARRAGAN DE",
+    "Usuario": "1002807110",
+    "Clave": "1063790636"
+  },
+  {
+    "Documento": "1037887314",
+    "Nombre del Estudiante": "JERONIMO CARDONA DUQUE",
+    "Usuario": "1002807111",
+    "Clave": "1037887314"
+  },
+  {
+    "Documento": "1020313429",
+    "Nombre del Estudiante": "JOSE FRANCISCO JIMENEZ URZOLA",
+    "Usuario": "1002807112",
+    "Clave": "1020313429"
+  },
+  {
+    "Documento": "1063790682",
+    "Nombre del Estudiante": "JUAN DIEGO ZULUAGA MUÑOZ",
+    "Usuario": "1002807113",
+    "Clave": "1063790682"
+  },
+  {
+    "Documento": "1041634712",
+    "Nombre del Estudiante": "LUCIANA ALVAREZ GORDON",
+    "Usuario": "1002807114",
+    "Clave": "1041634712"
+  },
+  {
+    "Documento": "1066745768",
+    "Nombre del Estudiante": "MARIA ANGEL ECHEVERRY RODRIGUEZ",
+    "Usuario": "1002807115",
+    "Clave": "1066745768"
+  },
+  {
+    "Documento": "1119399773",
+    "Nombre del Estudiante": "MARTIN ANDRES PITRE OCHOA",
+    "Usuario": "1002807116",
+    "Clave": "1119399773"
+  },
+  {
+    "Documento": "1063364708",
+    "Nombre del Estudiante": "NAHOMI PEREZ TORRALVO",
+    "Usuario": "1002807117",
+    "Clave": "1063364708"
+  },
+  {
+    "Documento": "1082982480",
+    "Nombre del Estudiante": "OSCAR ARMANDO SUAREZ MARTINEZ",
+    "Usuario": "1002807118",
+    "Clave": "1082982480"
+  },
+  {
+    "Documento": "1063364777",
+    "Nombre del Estudiante": "SALOME JULIO LOBO",
+    "Usuario": "1002807119",
+    "Clave": "1063364777"
+  },
+  {
+    "Documento": "1063364500",
+    "Nombre del Estudiante": "SANTIAGO JOSE ORTEGA PALOMINO",
+    "Usuario": "1002807120",
+    "Clave": "1063364500"
+  },
+  {
+    "Documento": "1063298791",
+    "Nombre del Estudiante": "SARA SOFIA BLANCO GOMEZ",
+    "Usuario": "1002807121",
+    "Clave": "1063298791"
+  },
+  {
+    "Documento": "1063791618",
+    "Nombre del Estudiante": "YOYCE ZABALA DE LA OSSA",
+    "Usuario": "1002807122",
+    "Clave": "1063791618"
+  },
+  {
+    "Documento": "1063293694",
+    "Nombre del Estudiante": "ANA SOFIA HURTADO PADILLA",
+    "Usuario": "1002808101",
+    "Clave": "1063293694"
+  },
+  {
+    "Documento": "1034784287",
+    "Nombre del Estudiante": "CAMILO ANDRES LOPEZ CORREA",
+    "Usuario": "1002808102",
+    "Clave": "1034784287"
+  },
+  {
+    "Documento": "1063292507",
+    "Nombre del Estudiante": "CARLOS MUÑOZ GALEANO",
+    "Usuario": "1002808103",
+    "Clave": "1063292507"
+  },
+  {
+    "Documento": "1016054102",
+    "Nombre del Estudiante": "EYMI CAMILA RICARDO CARRASCAL",
+    "Usuario": "1002808104",
+    "Clave": "1016054102"
+  },
+  {
+    "Documento": "1063363454",
+    "Nombre del Estudiante": "FERNAN ESTEBAN MARZOLA MARTINEZ",
+    "Usuario": "1002808105",
+    "Clave": "1063363454"
+  },
+  {
+    "Documento": "1028011016",
+    "Nombre del Estudiante": "JHOISER DANIEL CABRERA ALEAN",
+    "Usuario": "1002808106",
+    "Clave": "1028011016"
+  },
+  {
+    "Documento": "1044531686",
+    "Nombre del Estudiante": "LAURA XIMENA ZULUAGA ORTIZ",
+    "Usuario": "1002808107",
+    "Clave": "1044531686"
+  },
+  {
+    "Documento": "1063362593",
+    "Nombre del Estudiante": "LUIS FERNANDO URBIÑEZ RAMIREZ",
+    "Usuario": "1002808108",
+    "Clave": "1063362593"
+  },
+  {
+    "Documento": "1063364294",
+    "Nombre del Estudiante": "LUIS JOSE PINEDA MERCADO",
+    "Usuario": "1002808109",
+    "Clave": "1063364294"
+  },
+  {
+    "Documento": "1058935754",
+    "Nombre del Estudiante": "LUISA FERNANDA VERGARA FONTECHA",
+    "Usuario": "1002808110",
+    "Clave": "1058935754"
+  },
+  {
+    "Documento": "1063790440",
+    "Nombre del Estudiante": "NICOLLE SOFIA CORTES CARRASCAL",
+    "Usuario": "1002808111",
+    "Clave": "1063790440"
+  },
+  {
+    "Documento": "1063364003",
+    "Nombre del Estudiante": "SALOME GUZMAN SEÑA",
+    "Usuario": "1002808112",
+    "Clave": "1063364003"
+  },
+  {
+    "Documento": "1063790479",
+    "Nombre del Estudiante": "SAMUEL CASTRO GARCIA",
+    "Usuario": "1002808113",
+    "Clave": "1063790479"
+  },
+  {
+    "Documento": "1063364138",
+    "Nombre del Estudiante": "SIMON LOPEZ CANTERO",
+    "Usuario": "1002808114",
+    "Clave": "1063364138"
+  },
+  {
+    "Documento": "1063790176",
+    "Nombre del Estudiante": "VALERIA HERRERA FLOREZ",
+    "Usuario": "1002808115",
+    "Clave": "1063790176"
+  },
+  {
+    "Documento": "1063295881",
+    "Nombre del Estudiante": "XIMENA GONZALEZ IBAÑEZ",
+    "Usuario": "1002808116",
+    "Clave": "1063295881"
+  },
+  {
+    "Documento": "1038124580",
+    "Nombre del Estudiante": "XIMENA MONTIEL PARDO",
+    "Usuario": "1002808117",
+    "Clave": "1038124580"
+  },
+  {
+    "Documento": "1069492497",
+    "Nombre del Estudiante": "ZHAYRACK ALVAREZ ROMERO",
+    "Usuario": "1002808118",
+    "Clave": "1069492497"
+  },
+  {
+    "Documento": "1066606399",
+    "Nombre del Estudiante": "ABEL ANDRES HERRERA IBAÑEZ",
+    "Usuario": "1002809101",
+    "Clave": "1066606399"
+  },
+  {
+    "Documento": "1067613163",
+    "Nombre del Estudiante": "ALEJANDRO TAPIAS MARTINEZ",
+    "Usuario": "1002809102",
+    "Clave": "1067613163"
+  },
+  {
+    "Documento": "1066603280",
+    "Nombre del Estudiante": "ANA SOFIA GONZALEZ URBANO",
+    "Usuario": "1002809103",
+    "Clave": "1066603280"
+  },
+  {
+    "Documento": "10622442078",
+    "Nombre del Estudiante": "DANIELA MARIA RAMOS OCHOA",
+    "Usuario": "1002809104",
+    "Clave": "10622442078"
+  },
+  {
+    "Documento": "1062972042",
+    "Nombre del Estudiante": "DANNA SOFIA ACEVEDO CORDERO",
+    "Usuario": "1002809105",
+    "Clave": "1062972042"
+  },
+  {
+    "Documento": "1066742323",
+    "Nombre del Estudiante": "JOSE DANIEL BENITEZ RODRIGUEZ",
+    "Usuario": "1002809106",
+    "Clave": "1066742323"
+  },
+  {
+    "Documento": "1063789661",
+    "Nombre del Estudiante": "JOSE DANIEL PEREIRA MORENO",
+    "Usuario": "1002809107",
+    "Clave": "1063789661"
+  },
+  {
+    "Documento": "1063363379",
+    "Nombre del Estudiante": "JUAN DIEGO HORMAZA BEDOYA",
+    "Usuario": "1002809108",
+    "Clave": "1063363379"
+  },
+  {
+    "Documento": "1063790299",
+    "Nombre del Estudiante": "JUAN DIEGO MEZA ZABALA",
+    "Usuario": "1002809109",
+    "Clave": "1063790299"
+  },
+  {
+    "Documento": "50918123",
+    "Nombre del Estudiante": "JUAN FERNANDO ZARANTE RUBIO",
+    "Usuario": "1002809110",
+    "Clave": "50918123"
+  },
+  {
+    "Documento": "1038121367",
+    "Nombre del Estudiante": "LUIS CARLOS MAZO HENAO",
+    "Usuario": "1002809111",
+    "Clave": "1038121367"
+  },
+  {
+    "Documento": "1063363077",
+    "Nombre del Estudiante": "MARIASOL MONTIEL SEGURA",
+    "Usuario": "1002809112",
+    "Clave": "1063363077"
+  },
+  {
+    "Documento": "1066605905",
+    "Nombre del Estudiante": "MISHELL ARROYO CANO",
+    "Usuario": "1002809113",
+    "Clave": "1066605905"
+  },
+  {
+    "Documento": "1138026152",
+    "Nombre del Estudiante": "CRISTIAN TEJADA LORA",
+    "Usuario": "1002810101",
+    "Clave": "1138026152"
+  },
+  {
+    "Documento": "1067977301",
+    "Nombre del Estudiante": "ELIANY CAROLINA PUCHE HERAZO",
+    "Usuario": "1002810102",
+    "Clave": "1067977301"
+  },
+  {
+    "Documento": "1063790208",
+    "Nombre del Estudiante": "LEONEL ANTONIO SANCHEZ ROMERO",
+    "Usuario": "1002810103",
+    "Clave": "1063790208"
+  },
+  {
+    "Documento": "1063789837",
+    "Nombre del Estudiante": "MARIANA VILLADIEGO LOPEZ",
+    "Usuario": "1002810104",
+    "Clave": "1063789837"
+  },
+  {
+    "Documento": "1067908242",
+    "Nombre del Estudiante": "MARIANGEL PADILLA SUAREZ",
+    "Usuario": "1002810105",
+    "Clave": "1067908242"
+  },
+  {
+    "Documento": "44372046",
+    "Nombre del Estudiante": "MARY ANGEL ZULUAGA MUÑOZ",
+    "Usuario": "1002810106",
+    "Clave": "44372046"
+  },
+  {
+    "Documento": "1063789792",
+    "Nombre del Estudiante": "SAMUEL DAVID HERNANDEZ PARRA",
+    "Usuario": "1002810107",
+    "Clave": "1063789792"
+  },
+  {
+    "Documento": "1063789946",
+    "Nombre del Estudiante": "SANDRA YALENA LOPEZ DE ARCO",
+    "Usuario": "1002810108",
+    "Clave": "1063789946"
+  },
+  {
+    "Documento": "1062439282",
+    "Nombre del Estudiante": "SARA LUCIA BURGOS ROJAS",
+    "Usuario": "1002810109",
+    "Clave": "1062439282"
+  },
+  {
+    "Documento": "1066739718",
+    "Nombre del Estudiante": "SARA SOFIA SALGADO ARRIETA",
+    "Usuario": "1002810110",
+    "Clave": "1066739718"
+  },
+  {
+    "Documento": "1138081510",
+    "Nombre del Estudiante": "SHIRLY ESPITIA PERALTA",
+    "Usuario": "1002810111",
+    "Clave": "1138081510"
+  },
+  {
+    "Documento": "1063789982",
+    "Nombre del Estudiante": "VALENTINA PEDROZA BETANCUR",
+    "Usuario": "1002810112",
+    "Clave": "1063789982"
+  },
+  {
+    "Documento": "1063292289",
+    "Nombre del Estudiante": "VALERIA OCHOA CARDENAS",
+    "Usuario": "1002810113",
+    "Clave": "1063292289"
+  },
+  {
+    "Documento": "1063360394",
+    "Nombre del Estudiante": "DANIELA TORO ALVAREZ",
+    "Usuario": "1002811101",
+    "Clave": "1063360394"
+  },
+  {
+    "Documento": "1063359964",
+    "Nombre del Estudiante": "JEFERSON VALENCIA SAEZ",
+    "Usuario": "1002811102",
+    "Clave": "1063359964"
+  },
+  {
+    "Documento": "1063790047",
+    "Nombre del Estudiante": "JOSE FERNANDO PINEDA MERCADO",
+    "Usuario": "1002811103",
+    "Clave": "1063790047"
+  },
+  {
+    "Documento": "1062438502",
+    "Nombre del Estudiante": "LEANYS URZOLA CALONGE",
+    "Usuario": "1002811104",
+    "Clave": "1062438502"
+  },
+  {
+    "Documento": "1068423936",
+    "Nombre del Estudiante": "LEONELA SANCHEZ VILLADIEGO",
+    "Usuario": "1002811105",
+    "Clave": "1068423936"
+  },
+  {
+    "Documento": "1062966374",
+    "Nombre del Estudiante": "NATALY QUINTERO PACHECO",
+    "Usuario": "1002811106",
+    "Clave": "1062966374"
+  }
+];
+
+  
+  function buscarUsuario() {
+    // Ocultar mensajes anteriores
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('noEncontrado').style.display = 'none';
+
+    var docInput = document.getElementById('documentInput').value.trim();
+    if(docInput === "") {
+      alert("Por favor, ingresa un documento.");
+      return;
+    }
+    // Buscar en el JSON el registro con el documento ingresado utilizando la propiedad "Documento"
+    var usuarioEncontrado = datos.find(function(usuario) {
+      return usuario["Documento"] === docInput;
+    });
+    
+    if(usuarioEncontrado) {
+      // Mostrar la información del usuario encontrado usando los nombres correctos
+      document.getElementById('nombre').textContent = usuarioEncontrado["Nombre del Estudiante"];
+      document.getElementById('usuario').textContent = usuarioEncontrado["Usuario"];
+      document.getElementById('contraseña').textContent = usuarioEncontrado["Clave"];
+      document.getElementById('result').style.display = 'block';
+    } else {
+      // Mostrar mensaje de no encontrado
+      document.getElementById('noEncontrado').style.display = 'block';
+    }
+  }
+
+  </script>
+</body>
+</html>
