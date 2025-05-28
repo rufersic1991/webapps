@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual Interactivo - Operaciones con Material Concreto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .slide {
+      display: none;
+      animation: slideIn 0.6s ease-out;
+      padding: 40px;
+      min-height: 600px;
+    }
+    
+    .slide.active {
+      display: block;
+    }
+    
+    @keyframes slideIn {
+      from { 
+        opacity: 0; 
+        transform: translateX(30px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateX(0); 
+      }
+    }
+    
+    .material-card {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-radius: 15px;
+      padding: 20px;
+      margin: 15px 0;
+      color: white;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      transform: translateY(0);
+      transition: all 0.3s ease;
+    }
+    
+    .material-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+    
+    .operation-demo {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      margin: 20px 0;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border-left: 5px solid #3b82f6;
+    }
+    
+    .visual-blocks {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    
+    .block {
+      width: 30px;
+      height: 30px;
+      background: #3b82f6;
+      border-radius: 5px;
+      display: inline-block;
+      margin: 2px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .ten-block {
+      width: 120px;
+      height: 30px;
+      background: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      border-radius: 5px;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    
+    .nav-container {
+      background: #1f2937;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .slide-counter {
+      color: #9ca3af;
+      font-weight: 500;
+    }
+    
+    .math-expression {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #1f2937;
+      text-align: center;
+      margin: 15px 0;
+      padding: 15px;
+      background: #f3f4f6;
+      border-radius: 10px;
+    }
+    
+    .step {
+      margin: 15px 0;
+      padding: 15px;
+      background: #f8fafc;
+      border-radius: 10px;
+      border-left: 4px solid #10b981;
+    }
+    
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(135deg, #1f2937, #374151);
+      border-radius: 15px;
+      overflow: hidden;
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .video-container:hover {
+      transform: scale(1.02);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .video-placeholder {
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .reference-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+
+    .steam-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .screenshot-container {
+      text-align: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 15px;
+      border: 2px dashed #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header style="background: linear-gradient(135deg, #1e3a8a, #3730a3); padding: 40px; text-align: center; color: white;">
+      <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 10px;">
+        🔢 Manual Interactivo STEAM
+      </h1>
+      <p style="font-size: 1.2rem; opacity: 0.9;">
+        Aprendiendo operaciones básicas con material concreto
+      </p>
+      <p style="font-size: 1rem; opacity: 0.8; margin-top: 10px;">
+        Educación Primaria • Enfoque Interdisciplinario • Pensamiento Matemático Sistémico
+      </p>
+	  <p style="font-size: 1rem; margin-top: 15px; font-weight: bold;">
+    Autora: Shirley Castillo Coronado
+  </p>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" style="margin: 0;">
+      <div class="progress-fill" id="progressFill" style="width: 12.5%;"></div>
+    </div>
+
+    <!-- Slides Container -->
+    <div id="slides">
+      
+      <!-- Slide 1: Objetivos -->
+      <section class="slide active">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e3a8a; margin-bottom: 30px; text-align: center;">
+          🎯 Objetivos de Aprendizaje
+        </h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+          <div class="material-card">
+            <h3 style="font-weight: 600; margin-bottom: 10px;">🔍 Exploración</h3>
+            <p>Explorar el uso de material concreto en operaciones básicas con números naturales y desarrollar comprensión profunda.</p>
+          </div>
+          
+          <div class="material-card" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #1f2937;">
+            <h3 style="font-weight: 600; margin-bottom: 10px;">🔗 Conexión</h3>
+            <p>Relacionar procedimientos de agrupación concretos con algoritmos matemáticos abstractos.</p>
+          </div>
+          
+          <div class="material-card" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #1f2937;">
+            <h3 style="font-weight: 600; margin-bottom: 10px;">⚖️ Comprensión</h3>
+            <p>Reconocer la importancia del valor posicional, agrupación y sistema decimal en matemáticas.</p>
+          </div>
+          
+          <div class="material-card" style="background: linear-gradient(135deg, #a8caba 0%, #5d4e75 100%);">
+            <h3 style="font-weight: 600; margin-bottom: 10px;">🧠 Desarrollo</h3>
+            <p>Desarrollar pensamiento matemático sistémico en primaria con enfoque STEAM interdisciplinario.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #eff6ff; border-radius: 15px; border-left: 5px solid #3b82f6;">
+          <h3 style="color: #1e40af; font-weight: 600; margin-bottom: 10px;">📚 Aspectos Centrales del Aprendizaje</h3>
+          <p style="color: #1f2937;">Este manual establece conceptos, relaciones y situaciones que promueven el desarrollo integral del pensamiento matemático, conectando la manipulación física con la comprensión abstracta para estudiantes de 1° a 5° de primaria.</p>
+        </div>
+      </section>
+
+      <!-- Slide 2: Materiales -->
+      <section class="slide">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e3a8a; margin-bottom: 30px; text-align: center;">
+          🧮 Materiales Didácticos Concretos
+        </h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+          
+          <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div style="width: 60px; height: 60px; background: #3b82f6; border-radius: 10px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">🧱</div>
+            <h3 style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">Bloques Multibase</h3>
+            <p style="color: #6b7280; font-size: 0.9rem;">Representación visual de unidades, decenas y centenas. Esenciales para valor posicional.</p>
+          </div>
+          
+          <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div style="width: 60px; height: 60px; background: #ef4444; border-radius: 10px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">🍭</div>
+            <h3 style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">Palitos de Helado</h3>
+            <p style="color: #6b7280; font-size: 0.9rem;">Perfectos para agrupación, multiplicación y division. Fáciles de manipular.</p>
+          </div>
+          
+          <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div style="width: 60px; height: 60px; background: #10b981; border-radius: 10px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">🔴</div>
+            <h3 style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">Fichas de Colores</h3>
+            <p style="color: #6b7280; font-size: 0.9rem;">Para clasificación, conteo diferenciado y repartición equitativa.</p>
+          </div>
+          
+          <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div style="width: 60px; height: 60px; background: #8b5cf6; border-radius: 10px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">📏</div>
+            <h3 style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">Regletas Cuisenaire</h3>
+            <p style="color: #6b7280; font-size: 0.9rem;">Comprensión de proporciones, equivalencias y relaciones numéricas.</p>
+          </div>
+          
+          <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 10px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">🧩</div>
+            <h3 style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">Fichas LEGO</h3>
+            <p style="color: #6b7280; font-size: 0.9rem;">Construcción creativa y manipulación tridimensional de conceptos.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #f0fdf4; border-radius: 15px; border-left: 5px solid #10b981;">
+          <h3 style="color: #047857; font-weight: 600; margin-bottom: 10px;">💡 Importancia del Material Concreto</h3>
+          <p style="color: #1f2937;">Los materiales concretos permiten a los estudiantes <strong>manipular físicamente</strong> los conceptos matemáticos, facilitando la transición desde lo concreto hacia lo abstracto, respetando las etapas de desarrollo cognitivo.</p>
+        </div>
+      </section>
+
+      <!-- Slide 3: Suma -->
+      <section class="slide">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e3a8a; margin-bottom: 30px; text-align: center;">
+          ➕ Suma: Estructura Aditiva
+        </h2>
+        
+        <div class="operation-demo">
+          <div class="math-expression">23 + 14 = ?</div>
+          
+          <div class="step">
+            <h4 style="font-weight: 600; color: #059669; margin-bottom: 10px;">Paso 1: Representación con Bloques Multibase</h4>
+            <p><strong>Valor Posicional:</strong> Representa 23 usando 2 barras de decenas y 3 cubos unitarios. Luego representa 14 con 1 decena y 4 unidades.</p>
+            <div class="visual-blocks">
+              <div style="text-align: center; margin-right: 20px;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #1f2937;">23</div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <div class="ten-block">10</div>
+                  <div class="ten-block">10</div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                </div>
+              </div>
+              <span style="margin: 0 20px; font-size: 2rem; color: #3b82f6;">+</span>
+              <div style="text-align: center; margin-left: 20px;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #1f2937;">14</div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <div class="ten-block">10</div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="step">
+            <h4 style="font-weight: 600; color: #059669; margin-bottom: 10px;">Paso 2: Agrupación por Valor Posicional</h4>
+            <p><strong>Sistema Decimal:</strong> Suma las unidades: 3 + 4 = 7. Suma las decenas: 20 + 10 = 30. Resultado: 30 + 7 = 37</p>
+            <div class="visual-blocks">
+              <div style="text-align: center;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #059669;">Resultado: 37</div>
+                <div style="display: flex; align-items: center; gap: 5px; justify-content: center;">
+                  <div class="ten-block">10</div>
+                  <div class="ten-block">10</div>
+                  <div class="ten-block">10</div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="step">
+            <h4 style="font-weight: 600; color: #059669; margin-bottom: 10px;">Algoritmo Matemático</h4>
+            <div class="math-expression" style="background: #dcfce7; color: #059669;">23 + 14 = 37</div>
+            <p style="color: #6b7280; font-size: 0.9rem; text-align: center;">La manipulación concreta refuerza la comprensión del algoritmo abstracto</p>
+          </div>
+        </div>
+        
+        <div class="video-container" style="height: auto;">
+			<div class="video-placeholder" style="margin-bottom: 20px;">
+			<div style="font-size: 3rem; margin-bottom: 10px;">▶️</div>
+			<h3>Demostración Interactiva: Suma</h3>
+			<p>Observa el proceso paso a paso con material concreto</p>
+			<p style="font-size: 0.9rem; opacity: 0.7;">Haz clic para ver el video</p>
+		</div>
+
+		<iframe width="100%" height="315" style="border-radius: 15px;"
+			src="https://www.youtube.com/embed/1aXarShI7EI"
+			title="Suma con material concreto"
+			frameborder="0"
+			allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+			allowfullscreen>
+		</iframe>
+</div>
+
+      </section>
+
+      <!-- Slide 4: Resta -->
+      <section class="slide">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e3a8a; margin-bottom: 30px; text-align: center;">
+          ➖ Resta: Sustracción Concreta
+        </h2>
+        
+        <div class="operation-demo">
+          <div class="math-expression">45 - 21 = ?</div>
+          
+          <div class="step">
+            <h4 style="font-weight: 600; color: #dc2626; margin-bottom: 10px;">Paso 1: Representación Inicial</h4>
+            <p><strong>Agrupación:</strong> Representa 45 con fichas organizadas por valor posicional (4 grupos de 10 + 5 unidades)</p>
+            <div class="visual-blocks">
+              <div style="text-align: center;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #1f2937;">45 (Cantidad inicial)</div>
+                <div style="display: flex; align-items: center; gap: 5px; justify-content: center;">
+                  <div class="ten-block">10</div>
+                  <div class="ten-block">10</div>
+                  <div class="ten-block">10</div>
+                  <div class="ten-block">10</div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="step">
+            <h4 style="font-weight: 600; color: #dc2626; margin-bottom: 10px;">Paso 2: Sustracción Sistemática</h4>
+            <p><strong>Sistema Decimal:</strong> Quita 21 respetando el valor posicional: retira 2 decenas (20) y 1 unidad</p>
+            <div class="visual-blocks">
+              <div style="text-align: center;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #dc2626;">Quitamos 21</div>
+                <div style="display: flex; align-items: center; gap: 5px; justify-content: center;">
+                  <div class="ten-block" style="background: #9ca3af; opacity: 0.4; text-decoration: line-through;">10</div>
+                  <div class="ten-block" style="background: #9ca3af; opacity: 0.4; text-decoration: line-through;">10</div>
+                  <div class="ten-block">10</div>
+                  <div class="ten-block">10</div>
+                  <div class="block" style="background: #9ca3af; opacity: 0.4;"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="step">
+            <h4 style="font-weight: 600; color: #dc2626; margin-bottom: 10px;">Resultado Final</h4>
+            <div class="visual-blocks">
+              <div style="text-align: center;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #059669;">Quedan: 24</div>
+                <div style="display: flex; align-items: center; gap: 5px; justify-content: center;">
+                  <div class="ten-block">10</div>
+                  <div class="ten-block">10</div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                  <div class="block"></div>
+                </div>
+              </div>
+            </div>
+            <div class="math-expression" style="background: #fef2f2; color: #dc2626;">45 - 21 = 24</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 5: Multiplicación -->
+      <section class="slide">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e3a8a; margin-bottom: 30px; text-align: center;">
+          ✖️ Multiplicación: Estructura Multiplicativa
+        </h2>
+        
+        <div class="operation-demo">
+          <div class="math-expression">4 × 3 = ?</div>
+          
+          <div class="step">
+            <h4 style="font-weight: 600; color: #7c3aed; margin-bottom: 10px;">Paso 1: Grupos Iguales con Palitos</h4>
+            <p><strong>Concepto:</strong> Forma 4 grupos con 3 palitos de helado cada uno. La multiplicación representa grupos de igual cantidad.</p>
+            <div style="display: flex; justify-content: center; gap: 30px; margin: 25px 0; flex-wrap: wrap;">
+              <div style="text-align: center;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #7c3aed;">Grupo 1</div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                  <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                  <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                </div>
+                <div style="margin-top: 5px; font-size: 0.9rem; color: #6b7280;">3 palitos</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #7c3aed;">Grupo 2</div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                  <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                  <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                </div>
+                <div style="margin-top: 5px; font-size: 0.9rem; color: #6b7280;">3 palitos</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #7c3aed;">Grupo 3</div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                  <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                  <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                </div>
+                <div style="margin-top: 5px; font-size: 0.9rem; color: #6b7280;">3 palitos</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #7c3aed;">Grupo 4</div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                   <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                  <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                  <div style="width: 60px; height: 8px; background: #8b5cf6; border-radius: 4px;"></div>
+                </div>
+                <div style="margin-top: 5px; font-size: 0.9rem; color: #6b7280;">3 palitos</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <h4 style="font-weight: 600; color: #7c3aed; margin-bottom: 10px;">Paso 2: Conteo Total</h4>
+            <p><strong>Conteo:</strong> Cuenta todos los palitos. 4 grupos × 3 palitos = 12 palitos en total.</p>
+            <div class="math-expression" style="background: #ede9fe; color: #7c3aed;">4 × 3 = 12</div>
+          </div>
+
+          <div class="step">
+            <h4 style="font-weight: 600; color: #7c3aed; margin-bottom: 10px;">Algoritmo Matemático</h4>
+            <p style="color: #6b7280; font-size: 0.9rem; text-align: center;">La multiplicación se interpreta como suma repetida: 3 + 3 + 3 + 3 = 12</p>
+          </div>
+        </div>
+
+        <div class="video-container" style="height: auto;">
+  <div class="video-placeholder" style="margin-bottom: 20px;">
+    <div style="font-size: 3rem; margin-bottom: 10px;">▶️</div>
+    <h3>Demostración Interactiva: Multiplicación</h3>
+    <p>Visualiza cómo se forman los grupos iguales</p>
+    <p style="font-size: 0.9rem; opacity: 0.7;">Haz clic para ver el video</p>
+  </div>
+
+  <iframe width="100%" height="315" style="border-radius: 15px;"
+    src="https://www.youtube.com/embed/9VyWKj1_81c"
+    title="Multiplicación con material concreto"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+  </iframe>
+</div>
+
+		
+      </section>
+	  <section class="slide">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e3a8a; margin-bottom: 30px; text-align: center;">
+          ➗ División: Reparto Equitativo
+        </h2>
+        
+        <div class="operation-demo">
+          <div class="math-expression">12 ÷ 4 = ?</div>
+          
+          <div class="step">
+            <h4 style="font-weight: 600; color: #d97706; margin-bottom: 10px;">Paso 1: Representación del Dividendo con Fichas</h4>
+            <p><strong>Concepto:</strong> Representa la cantidad total a repartir (dividendo). Para 12 ÷ 4, toma 12 fichas de colores (o bloques unitarios).</p>
+            <div class="visual-blocks" style="justify-content: center; margin-bottom: 15px;">
+              <div style="text-align: center;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #1f2937;">12 Fichas (Dividendo)</div>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 5px;">
+                  <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+                  <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+                  <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="step">
+            <h4 style="font-weight: 600; color: #d97706; margin-bottom: 10px;">Paso 2: Reparto en Grupos Iguales (Divisor)</h4>
+            <p><strong>Agrupación:</strong> Divide las 12 fichas en 4 grupos iguales, ya que el divisor es 4. Coloca una ficha en cada grupo hasta que todas se hayan repartido.</p>
+            <div style="display: flex; justify-content: space-around; margin: 25px 0; flex-wrap: wrap; gap: 20px;">
+              <div style="text-align: center; padding: 10px; background: #f0f9ff; border-radius: 8px; border: 1px solid #bae6fd;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #0ea5e9;">Grupo 1</div>
+                <div style="display: flex; gap: 5px; justify-content: center;">
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                </div>
+              </div>
+              <div style="text-align: center; padding: 10px; background: #f0f9ff; border-radius: 8px; border: 1px solid #bae6fd;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #0ea5e9;">Grupo 2</div>
+                <div style="display: flex; gap: 5px; justify-content: center;">
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                </div>
+              </div>
+              <div style="text-align: center; padding: 10px; background: #f0f9ff; border-radius: 8px; border: 1px solid #bae6fd;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #0ea5e9;">Grupo 3</div>
+                <div style="display: flex; gap: 5px; justify-content: center;">
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                </div>
+              </div>
+              <div style="text-align: center; padding: 10px; background: #f0f9ff; border-radius: 8px; border: 1px solid #bae6fd;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #0ea5e9;">Grupo 4</div>
+                <div style="display: flex; gap: 5px; justify-content: center;">
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                  <div class="block" style="background-color: #38bdf8;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="step">
+            <h4 style="font-weight: 600; color: #d97706; margin-bottom: 10px;">Paso 3: Conteo por Grupo (Cociente)</h4>
+            <p><strong>Sistema Decimal / Resultado:</strong> Cuenta cuántas fichas hay en cada grupo. Cada grupo tiene 3 fichas. Este es el resultado (cociente) de la división.</p>
+            <div class="math-expression" style="background: #fffbeb; color: #d97706;">12 ÷ 4 = 3</div>
+            <p style="color: #6b7280; font-size: 0.9rem; text-align: center;">La división se comprende como un reparto equitativo o la formación de grupos iguales.</p>
+          </div>
+        </div>
+		
+		
+		 <div class="video-container" style="height: auto;">
+  <div class="video-placeholder" style="margin-bottom: 20px;">
+    <div style="font-size: 3rem; margin-bottom: 10px;">▶️</div>
+    <h3>Demostración Interactiva: División</h3>
+    <p>bserva cómo se reparten las cantidades en partes iguale</p>
+    <p style="font-size: 0.9rem; opacity: 0.7;">Haz clic para ver el video</p>
+  </div>
+
+ <iframe width="560" height="315" src="https://www.youtube.com/embed/KjecBJLsHp4?si=2zkg4vW_SF0CykCS" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+        
+      
+      </section>
+<!-- Slide 6: Referencias Bibliográficas -->
+<section class="slide">
+  <h2 style="font-size: 2rem; font-weight: 700; color: #1e3a8a; margin-bottom: 30px; text-align: center;">
+    📚 Referencias Bibliográficas
+  </h2>
+  
+  <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); max-height: 500px; overflow-y: auto;">
+    
+    <!-- Referencia 1: Libro -->
+    <div class="reference-card">
+      <p style="margin: 0; line-height: 1.8; color: #1f2937; font-size: 0.9rem; text-align: left;">
+        Alsina, C. (2019). <em>Enseñanza de las matemáticas con material manipulativo: Una propuesta didáctica integral</em>. Editorial Síntesis.
+      </p>
+    </div>
+    
+    <!-- Referencia 2: Libro con múltiples autores -->
+    <div class="reference-card">
+      <p style="margin: 0; line-height: 1.8; color: #1f2937; font-size: 0.9rem; text-align: left;">
+        Baroody, A. J., & Coslick, R. T. (2020). <em>Fostering children's mathematical power: An investigative approach to K-8 mathematics instruction</em> (2.ª ed.). Routledge.
+      </p>
+    </div>
+    
+    <!-- Referencia 3: Artículo de revista -->
+    <div class="reference-card">
+  <p style="margin: 0; line-height: 1.8; color: #1f2937; font-size: 0.9rem; text-align: left;">
+    Bruner, J. S. (1963). <em>El proceso de la educación</em> (C. Palomar, Trad.). México: Unión Tipográfica Editorial Hispano Americana (UTEHA). (Obra original publicada en 1960).
+  </p>
+</div>
+
+    
+    <!-- Referencia 4: Meta-análisis -->
+    <div class="reference-card">
+      <p style="margin: 0; line-height: 1.8; color: #1f2937; font-size: 0.9rem; text-align: left;">
+        Carbonneau, K. J., Marley, S. C., & Selig, J. P. (2013). A meta-analysis of the efficacy of teaching mathematics with concrete manipulatives. <em>Journal of Educational Psychology</em>, <em>105</em>(2), 380-400. https://doi.org/10.1037/a0031084
+      </p>
+    </div>
+    
+    <!-- Referencia 5: Autor clásico -->
+    <div class="reference-card">
+      <p style="margin: 0; line-height: 1.8; color: #1f2937; font-size: 0.9rem; text-align: left;">
+        Dienes, Z. P. (1960). <em>Building up mathematics</em>. Hutchinson Educational.
+      </p>
+    </div>
+    
+    <!-- Referencia 6: Documento gubernamental -->
+    <div class="reference-card">
+      <p style="margin: 0; line-height: 1.8; color: #1f2937; font-size: 0.9rem; text-align: left;">
+        Ministerio de Educación Nacional. (2006). <em>Estándares básicos de competencias en matemáticas</em>. MEN.
+      </p>
+    </div>
+    
+    <!-- Referencia 7: Organización profesional -->
+    <div class="reference-card">
+      <p style="margin: 0; line-height: 1.8; color: #1f2937; font-size: 0.9rem; text-align: left;">
+        National Council of Teachers of Mathematics. (2000). <em>Principles and standards for school mathematics</em>. NCTM.
+      </p>
+    </div>
+    
+    <!-- Referencia 8: Múltiples autores -->
+    <div class="reference-card">
+      <p style="margin: 0; line-height: 1.8; color: #1f2937; font-size: 0.9rem; text-align: left;">
+        Piaget, J., & García, R. (1982). <em>Psicogénesis e historia de la ciencia</em>. Siglo XXI Editores.
+      </p>
+    </div>
+    
+    <!-- Referencia 9: Artículo especializado -->
+    <div class="reference-card">
+      <p style="margin: 0; line-height: 1.8; color: #1f2937; font-size: 0.9rem; text-align: left;">
+        Sowell, E. J. (1989). Effects of manipulative materials in mathematics instruction—A meta-analysis. <em>Journal for Research in Mathematics Education</em>, <em>20</em>(5), 498-505. https://doi.org/10.2307/749423
+      </p>
+    </div>
+    
+    <!-- Referencia 10: Organización internacional -->
+    <div class="reference-card">
+      <p style="margin: 0; line-height: 1.8; color: #1f2937; font-size: 0.9rem; text-align: left;">
+        UNESCO. (2017). <em>La educación al servicio de los pueblos y el planeta: Creación de futuros sostenibles para todos</em>. UNESCO.
+      </p>
+    </div>
+    
+  </div>
+
+  
+</section>
+    </div>
+
+    <!-- Navegación -->
+    <div class="nav-container">
+      <button class="btn" onclick="prevSlide()">⬅️ Anterior</button>
+      <span class="slide-counter" id="slideCounter">1 / 5</span>
+      <button class="btn" onclick="nextSlide()">Siguiente ➡️</button>
+    </div>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const progressFill = document.getElementById('progressFill');
+    const slideCounter = document.getElementById('slideCounter');
+
+    function updateSlideDisplay() {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === currentSlide);
+      });
+      const progressPercent = ((currentSlide + 1) / slides.length) * 100;
+      progressFill.style.width = progressPercent + '%';
+      slideCounter.textContent = `${currentSlide + 1} / ${slides.length}`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        updateSlideDisplay();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlideDisplay();
+      }
+    }
+
+    function playDemo(type) {
+      alert('Aquí se podría integrar un video o simulación interactiva para la operación: ' + type);
+    }
+
+    updateSlideDisplay();
+  </script>
+</body>
+</html>
