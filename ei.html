@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>English Quiz con Gamificación</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', sans-serif;
+      margin: 0;
+      background: linear-gradient(to bottom right, #fce4ec, #e0f7fa);
+      text-align: center;
+      color: #333;
+      padding-bottom: 20px;
+    }
+
+    header {
+      background: #8e24aa;
+      color: white;
+      padding: 1rem;
+      font-size: 1.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .quiz-container {
+      max-width: 800px;
+      margin: 1rem auto;
+      padding: 1rem;
+    }
+
+    .game-stats {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 15px;
+      background-color: rgba(255, 255, 255, 0.85);
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .game-stats div {
+      margin: 0 8px;
+      text-align: center;
+    }
+    #lives-container span {
+      font-size: 1.6rem;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+    #streak-value {
+        color: #ff9800;
+    }
+    #score-value {
+        color: #4caf50;
+    }
+
+    .button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1.1rem;
+      margin: 0.5rem;
+      background-color: #00bcd4;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .button:hover:not(:disabled) {
+        background-color: #0097a7;
+        transform: translateY(-2px);
+    }
+
+    .button:disabled {
+        background-color: #bdbdbd;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .word-display-container {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: #5e35b1;
+      margin: 1rem 0;
+      min-height: 3.5rem;
+      letter-spacing: 1px;
+      text-transform: capitalize;
+    }
+
+    .images-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+      margin: 2rem 0;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .option {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-size: 4rem;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid transparent;
+    }
+
+    .option:hover:not(.disabled-option) {
+      transform: scale(1.05);
+      background: #e1bee7;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      border-color: #8e24aa;
+    }
+    
+    .option.disabled-option {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    .option.correct-selection {
+        background-color: #c8e6c9 !important;
+        border-color: #4caf50 !important;
+        transform: scale(1.05);
+        animation: correctPulse 0.6s ease-in-out;
+    }
+    
+    .option.incorrect-selection {
+        background-color: #ffcdd2 !important;
+        border-color: #f44336 !important;
+        transform: scale(0.95);
+        opacity: 0.7;
+        animation: incorrectShake 0.6s ease-in-out;
+    }
+
+    @keyframes correctPulse {
+      0%, 100% { transform: scale(1.05); }
+      50% { transform: scale(1.15); }
+    }
+
+    @keyframes incorrectShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .feedback {
+      font-size: 1.6rem;
+      margin-top: 1rem;
+      font-weight: bold;
+      min-height: 2.5rem;
+      transition: color 0.3s;
+    }
+    
+    #game-end-message {
+        display: none;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-top: 1.5rem;
+        padding: 20px;
+        border-radius: 15px;
+    }
+    #game-end-message.win {
+        color: #2e7d32;
+        background-color: #e8f5e9;
+        border: 3px solid #a5d6a7;
+    }
+    #game-end-message.over {
+        color: #c62828;
+        background-color: #ffebee;
+        border: 3px solid #ef9a9a;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: #e0e0e0;
+      border-radius: 4px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #8bc34a);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    /* Responsive design */
+    @media (max-width: 600px) {
+      .option {
+        font-size: 3rem;
+        padding: 1rem;
+      }
+      .word-display-container {
+        font-size: 2.2rem;
+      }
+      .images-grid {
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<audio id="correct-sound" preload="auto">
+  <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
+</audio>
+<audio id="incorrect-sound" preload="auto">
+  <source src="https://www.soundjay.com/misc/sounds/fail-buzzer-02.wav" type="audio/wav">
+</audio>
+
+<header>🎧 Mi Quiz de Inglés Interactivo 🎧</header>
+
+<div class="quiz-container">
+  <div class="game-stats">
+    <div>Vidas: <span id="lives-container"></span></div>
+    <div>Puntos: <span id="score-value">0</span></div>
+    <div>Racha: <span id="streak-value">0</span> 🔥</div>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+  </div>
+
+  <button class="button" id="start-game-button">🚀 Empezar Juego</button>
+  <button class="button" id="repeat-button" disabled>🔊 Repetir</button>
+  
+  <div id="word-display" class="word-display-container"></div>
+  <div id="images" class="images-grid"></div>
+  <div id="feedback" class="feedback"></div>
+  <div id="game-end-message"></div>
+</div>
+
+<script>
+  const questions = [
+    // Familia
+    { word: "mother", spanish: "Madre", correct: "👩", options: ["👨", "👵", "👧", "👩"] },
+    { word: "father", spanish: "Padre", correct: "👨", options: ["👨", "👩", "👴", "👦"] },
+    { word: "grandmother", spanish: "Abuela", correct: "👵", options: ["👴", "👩", "👵", "👶"] },
+    { word: "grandfather", spanish: "Abuelo", correct: "👴", options: ["👵", "👨", "👧", "👴"] },
+    { word: "sister", spanish: "Hermana", correct: "👧", options: ["👦", "👧", "👩", "👨"] },
+    { word: "brother", spanish: "Hermano", correct: "👦", options: ["👶", "👦", "👴", "👧"] },
+    // Frutas
+    { word: "apple", spanish: "Manzana", correct: "🍎", options: ["🍌", "🍊", "🍎", "🍇"] },
+    { word: "grapes", spanish: "Uvas", correct: "🍇", options: ["🍇", "🍉", "🍓", "🍍"] },
+    { word: "pear", spanish: "Pera", correct: "🍐", options: ["🥝", "🍐", "🍎", "🍋"] },
+    { word: "watermelon", spanish: "Sandía / Patilla", correct: "🍉", options: ["🍒", "🍓", "🍉", "🍑"] },
+    { word: "orange", spanish: "Naranja", correct: "🍊", options: ["🍋", "🍊", "🍎", "🍍"] },
+    { word: "banana", spanish: "Banano", correct: "🍌", options: ["🍎", "🍌", "🍇", "🍓"] },
+    { word: "pineapple", spanish: "Piña", correct: "🍍", options: ["🍍", "🥭", "🥥", "🥝"] },
+    // Vegetales
+    { word: "carrot", spanish: "Zanahoria", correct: "🥕", options: ["🍅", "🥦", "🥕", "🧅"] },
+    { word: "onion", spanish: "Cebolla", correct: "🧅", options: ["🧄", "🧅", "🥔", "🥬"] },
+    { word: "pepper", spanish: "Pimentón", correct: "🫑", options: ["🌶️", "🌽", "🫑", "🍆"] },
+    { word: "garlic", spanish: "Ajo", correct: "🧄", options: ["🧅", "🧄", "🍄", "🥔"] },
+    { word: "lettuce", spanish: "Lechuga", correct: "🥬", options: ["🥬", "🥦", "🥒", "🫑"] },
+    { word: "eggplant", spanish: "Berenjena", correct: "🍆", options: ["🍆", "🌽", "🥕", "🍠"] },
+    { word: "tomato", spanish: "Tomate", correct: "🍅", options: ["🍓", "🍎", "🍅", "🌶️"] }
+  ];
+
+  let currentQuestion = {};
+  let unaskedQuestions = [];
+  let questionsAnswered = 0;
+  
+  // Variables de Gamificación
+  let score = 0;
+  const MAX_LIVES = 3;
+  let lives = MAX_LIVES;
+  let streak = 0;
+  const POINTS_PER_CORRECT = 10;
+  let gameActive = false;
+
+  // Elementos del DOM
+  const wordDisplay = document.getElementById('word-display');
+  const feedbackDisplay = document.getElementById("feedback");
+  const imagesContainer = document.getElementById("images");
+  const startGameButton = document.getElementById('start-game-button');
+  const repeatButton = document.getElementById('repeat-button');
+  const gameEndMessageDisplay = document.getElementById('game-end-message');
+  const progressFill = document.getElementById('progress-fill');
+
+  const scoreValueDisplay = document.getElementById('score-value');
+  const livesContainerDisplay = document.getElementById('lives-container');
+  const streakValueDisplay = document.getElementById('streak-value');
+  
+  const correctSound = document.getElementById('correct-sound');
+  const incorrectSound = document.getElementById('incorrect-sound');
+
+  // Funciones de sonido con fallback silencioso
+  function playSound(audio) {
+    try {
+      audio.currentTime = 0;
+      audio.play().catch(() => {
+        // Silenciosamente manejar errores de audio
+      });
+    } catch (e) {
+      // Silenciosamente manejar errores de audio
+    }
+  }
+
+  // Funciones de actualización de UI
+  function updateScoreDisplay() {
+    scoreValueDisplay.textContent = score;
+  }
+
+  function updateLivesDisplay() {
+    livesContainerDisplay.innerHTML = '';
+    for (let i = 0; i < lives; i++) {
+      const heart = document.createElement('span');
+      heart.textContent = '❤️';
+      livesContainerDisplay.appendChild(heart);
+    }
+    for (let i = lives; i < MAX_LIVES; i++) {
+      const heart = document.createElement('span');
+      heart.textContent = '🤍';
+      livesContainerDisplay.appendChild(heart);
+    }
+  }
+
+  function updateStreakDisplay() {
+    streakValueDisplay.textContent = streak;
+  }
+
+  function updateProgressBar() {
+    const progress = (questionsAnswered / questions.length) * 100;
+    progressFill.style.width = progress + '%';
+  }
+
+  // Funciones del juego
+  function startGame() {
+    score = 0;
+    lives = MAX_LIVES;
+    streak = 0;
+    questionsAnswered = 0;
+    gameActive = true;
+    
+    updateScoreDisplay();
+    updateLivesDisplay();
+    updateStreakDisplay();
+    updateProgressBar();
+
+    // Crear copia de preguntas y mezclar
+    unaskedQuestions = [...questions].sort(() => Math.random() - 0.5);
+    
+    startGameButton.textContent = '🎲 Siguiente Palabra';
+    repeatButton.disabled = false;
+    gameEndMessageDisplay.style.display = 'none';
+    imagesContainer.style.display = 'grid';
+    wordDisplay.style.display = 'block';
+
+    nextQuestion();
+  }
+
+  function nextQuestion() {
+    if (!gameActive || lives <= 0) {
+        handleGameOver();
+        return;
+    }
+
+    if (unaskedQuestions.length > 0) {
+      currentQuestion = unaskedQuestions.pop();
+      currentQuestion.mistakeMadeThisTurn = false;
+      
+      wordDisplay.textContent = currentQuestion.word;
+      feedbackDisplay.textContent = "";
+      showOptions(currentQuestion);
+      speakWord(currentQuestion.word);
+      startGameButton.disabled = true;
+      
+      // Limpiar clases de respuestas anteriores
+      const allOptions = imagesContainer.querySelectorAll('.option');
+      allOptions.forEach(opt => {
+        opt.classList.remove('correct-selection', 'incorrect-selection', 'disabled-option');
+        opt.onclick = (e) => checkAnswer(opt.textContent, opt);
+      });
+    } else {
+      handleGameWin();
+    }
+  }
+
+  function speakWord(word) {
+    if (!word || !gameActive) return;
+    try {
+      speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(word);
+      utter.lang = "en-US";
+      utter.rate = 0.7;
+      utter.volume = 1.0;
+      utter.pitch = 1.1;
+      speechSynthesis.speak(utter);
+    } catch (e) {
+      console.log("Speech synthesis not available");
+    }
+  }
+
+  function repeatWord() {
+    if (gameActive && currentQuestion.word) {
+      speakWord(currentQuestion.word);
+    }
+  }
+
+  function showOptions(question) {
+    imagesContainer.innerHTML = "";
+    // Asegurar que siempre tengamos exactamente 4 opciones únicas
+    let optionsSet = new Set(question.options);
+    let optionsArray = Array.from(optionsSet);
+    
+    // Si hay menos de 4 opciones únicas, completar con opciones aleatorias
+    while (optionsArray.length < 4) {
+      const randomEmoji = getRandomEmoji();
+      if (!optionsArray.includes(randomEmoji)) {
+        optionsArray.push(randomEmoji);
+      }
+    }
+    
+    // Asegurar que la respuesta correcta esté incluida
+    if (!optionsArray.includes(question.correct)) {
+      optionsArray[0] = question.correct;
+    }
+    
+    // Mezclar las opciones
+    const shuffledOptions = optionsArray.sort(() => Math.random() - 0.5);
+
+    shuffledOptions.forEach(emoji => {
+      const div = document.createElement("div");
+      div.className = "option";
+      div.textContent = emoji;
+      div.onclick = () => checkAnswer(emoji, div);
+      imagesContainer.appendChild(div);
+    });
+  }
+
+  function getRandomEmoji() {
+    const emojis = ["🍎", "🍌", "🍊", "🍇", "🍐", "🍉", "🍓", "🍍", "🥕", "🧅", "🍅", "👨", "👩", "👧", "👦", "👴", "👵"];
+    return emojis[Math.floor(Math.random() * emojis.length)];
+  }
+
+  function checkAnswer(selected, element) {
+    if (!gameActive) return;
+
+    const allOptions = imagesContainer.querySelectorAll('.option');
+    allOptions.forEach(opt => {
+        opt.onclick = null;
+        opt.classList.add('disabled-option');
+    });
+    
+    startGameButton.disabled = false;
+
+    if (selected === currentQuestion.correct) {
+      feedbackDisplay.textContent = `✅ ¡Correcto! Es "${currentQuestion.spanish}"`;
+      feedbackDisplay.style.color = "green";
+      element.classList.add('correct-selection');
+      playSound(correctSound);
+
+      if (!currentQuestion.mistakeMadeThisTurn) {
+        score += POINTS_PER_CORRECT;
+        streak++;
+        questionsAnswered++;
+      }
+      
+      updateScoreDisplay();
+      updateStreakDisplay();
+      updateProgressBar();
+      
+    } else {
+      feedbackDisplay.textContent = `❌ Incorrecto. La respuesta correcta es "${currentQuestion.spanish}"`;
+      feedbackDisplay.style.color = "red";
+      element.classList.add('incorrect-selection');
+      
+      // Mostrar la respuesta correcta
+      allOptions.forEach(opt => {
+        if (opt.textContent === currentQuestion.correct) {
+          opt.classList.add('correct-selection');
+          opt.classList.remove('disabled-option');
+        }
+      });
+      
+      playSound(incorrectSound);
+
+      if (!currentQuestion.mistakeMadeThisTurn) {
+        lives--;
+        streak = 0;
+        currentQuestion.mistakeMadeThisTurn = true;
+      }
+      
+      updateLivesDisplay();
+      updateStreakDisplay();
+
+      if (lives <= 0) {
+        gameActive = false;
+        setTimeout(handleGameOver, 1500);
+        return;
+      }
+    }
+  }
+
+  function handleGameOver() {
+    gameActive = false;
+    wordDisplay.style.display = 'none';
+    imagesContainer.style.display = 'none';
+    feedbackDisplay.textContent = "";
+    
+    gameEndMessageDisplay.innerHTML = `💔 ¡Juego Terminado! 💔<br>Puntuación Final: ${score}<br>Preguntas Respondidas: ${questionsAnswered}/${questions.length}`;
+    gameEndMessageDisplay.className = 'over';
+    gameEndMessageDisplay.style.display = 'block';
+
+    startGameButton.textContent = '🚀 Jugar de Nuevo';
+    startGameButton.onclick = startGame;
+    startGameButton.disabled = false;
+    repeatButton.disabled = true;
+  }
+
+  function handleGameWin() {
+    gameActive = false;
+    wordDisplay.textContent = "🎉 ¡Felicidades! 🎉";
+    feedbackDisplay.innerHTML = `Completaste todas las palabras.<br>Puntuación Final: ${score}`;
+    imagesContainer.innerHTML = "";
+    
+    gameEndMessageDisplay.innerHTML = `🏆 ¡Has Ganado! 🏆<br>Puntuación Final: ${score}<br>¡Perfecto ${questions.length}/${questions.length}!`;
+    gameEndMessageDisplay.className = 'win';
+    gameEndMessageDisplay.style.display = 'block';
+    
+    startGameButton.textContent = '🚀 Jugar de Nuevo';
+    startGameButton.onclick = startGame;
+    startGameButton.disabled = false;
+    repeatButton.disabled = true;
+  }
+
+  // Event listeners
+  startGameButton.addEventListener('click', startGame);
+  repeatButton.addEventListener('click', repeatWord);
+
+  // Inicialización
+  window.onload = () => {
+    updateLivesDisplay();
+    updateScoreDisplay();
+    updateStreakDisplay();
+    feedbackDisplay.textContent = "¡Presiona 'Empezar Juego' para comenzar!";
+  };
+</script>
+
+</body>
+</html>
