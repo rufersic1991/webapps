@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infografía Híbrida: Educar sin Excluir</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@400;600&display=swap');
+
+        :root {
+            --bg-dark: #0d0c1d;
+            --bg-card: #1c1b3a;
+            --primary: #6c5ce7;
+            --secondary: #f67280;
+            --accent: #a29bfe;
+            --text: #e0e0e0;
+            --header-text: #ffffff;
+            --glow: rgba(108, 92, 231, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text);
+            padding: 2rem 0;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: auto;
+            padding: 0 1rem;
+        }
+        
+        /* --- HEADER --- */
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            color: var(--header-text);
+            text-shadow: 0 0 10px var(--glow), 0 0 20px var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        header .authors {
+            font-size: 1.1rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* --- SECCIONES --- */
+        .section {
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            border-radius: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--header-text);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .section p {
+            font-size: 1.1rem;
+        }
+
+        /* --- NODOS INTERACTIVOS (CONCEPTOS) --- */
+        .nodes-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 2rem;
+            text-align: center;
+        }
+        .node {
+            cursor: pointer;
+            text-align: center;
+        }
+        .node-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: grid;
+            place-items: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1rem;
+            border: 3px solid var(--accent);
+            box-shadow: 0 0 15px var(--glow);
+            animation: pulse 2s infinite ease-in-out;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .node:hover .node-circle {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px var(--glow);
+            animation-play-state: paused;
+        }
+        .node h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent);
+        }
+
+        /* --- VENTANA MODAL --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.4s;
+        }
+        .modal-content {
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--primary);
+            width: 90%;
+            max-width: 600px;
+            animation: zoomIn 0.4s forwards;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-family: 'Orbitron', sans-serif; color: var(--secondary); margin: 0; }
+        .close-btn { font-size: 2rem; color: var(--accent); cursor: pointer; transition: transform 0.3s; }
+        .close-btn:hover { transform: scale(1.2); }
+        .modal-body { margin-top: 1.5rem; }
+        .modal-body .ejemplo { background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 3px solid var(--secondary); font-style: italic;}
+        .modal-body .desafio { font-weight: bold; color: var(--accent); }
+
+        /* --- TIMELINE DE POLÍTICAS --- */
+        .timeline { position: relative; padding: 1rem 0; }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--glow);
+        }
+        .timeline-item { position: relative; padding-left: 50px; margin-bottom: 2rem; }
+        .timeline-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 2.5rem;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            padding: 0 5px;
+        }
+        .timeline-item h3 { color: var(--secondary); }
+
+        /* --- CONCLUSIONES SPOTLIGHT --- */
+        .conclusiones-grid { display: flex; flex-direction: column; gap: 1.5rem; }
+        .conclusion-item {
+            padding: 1rem;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            transition: transform 0.3s, border-color 0.3s, background-color 0.3s;
+        }
+        .conclusion-item:hover {
+            transform: scale(1.03);
+            border-color: var(--secondary);
+            background-color: #0d0c1d;
+        }
+        
+        /* --- ACORDEÓN --- */
+        .accordion-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .accordion-header h2 { margin-bottom: 0; }
+        .accordion-icon { font-size: 2rem; transition: transform 0.3s ease; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
+        .accordion-content ul { list-style: none; padding: 1.5rem 0 0 0; }
+        .accordion-content li { margin-bottom: 1rem; font-size: 0.9rem; }
+        .accordion-content a { color: var(--secondary); font-weight: 600; text-decoration: none; }
+        .accordion-header.active .accordion-icon { transform: rotate(135deg); }
+
+        /* --- KEYFRAMES --- */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Educar sin Excluir</h1>
+        <p class="authors"> Autoras: Rubiela Porras, Anyi Chantre y Edilma Ibañez</p>
+    </header>
+
+    <section class="section">
+        <p> En las aulas, donde debería primar la diversidad y el respeto mutuo, aún persisten prácticas que reproducen formas de exclusión, racismo y autoritarismo.  Reconocer estos patrones es el primer paso para construir una escuela verdaderamente inclusiva. </p>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Conceptos Fundamentales</h2>
+        <p style="text-align:center; margin-bottom: 2rem;">Haz clic en cada concepto para explorar</p>
+        <div class="nodes-container">
+            <div class="node" onclick="openModal('modal-disc')">
+                <div class="node-circle">🚫</div>
+                <h3>Discriminación</h3>
+            </div>
+            <div class="node" onclick="openModal('modal-excl')">
+                <div class="node-circle">🚪</div>
+                <h3>Exclusión</h3>
+            </div>
+            <div class="node" onclick="openModal('modal-incl')">
+                <div class="node-circle">🤝</div>
+                <h3>Inclusión</h3>
+            </div>
+            <div class="node" onclick="openModal('modal-etic')">
+                <div class="node-circle">💖</div>
+                <h3>Ética del Cuidado</h3>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Políticas Poblacionales Clave</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-icon">📜</div>
+                <h3>Declaración de Salamanca (1994)</h3>
+                <p> Un hito internacional que sentó las bases para un enfoque de derechos en la educación inclusiva.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-icon">🇨🇴</div>
+                <h3>Política Nacional de Educación Inclusiva (MEN, 2022)</h3>
+                <p> El marco normativo más reciente en Colombia, que promueve estrategias para combatir las múltiples formas de discriminación en el sistema educativo.</p>
+                <p class="desafio"> <strong>Desafío Docente:</strong> Conocer y aplicar estas políticas con criterio pedagógico en contextos reales.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Rol del Docente</h2>
+        <div class="conclusiones-grid">
+             <div class="conclusion-item"><p> Su responsabilidad ética implica crear condiciones para que todos aprendan en igualdad de oportunidades.</p></div>
+             <div class="conclusion-item"><p> Requiere sensibilidad, formación continua y una postura crítica frente a las estructuras que perpetúan desigualdades.</p></div>
+             <div class="conclusion-item"><p> Educar desde la inclusión significa actuar con justicia, afecto y la convicción de que la diferencia es parte esencial de la educación.</p></div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Conclusiones</h2>
+        <div class="conclusiones-grid">
+            <div class="conclusion-item"><p><strong>1.</strong>  La inclusión es un principio ético que debe materializarse en cada decisión pedagógica, no un simple discurso institucional.</p></div>
+            <div class="conclusion-item"><p><strong>2.</strong>  El rol docente exige romper con la neutralidad aparente y posicionarse activamente contra toda forma de discriminación.</p></div>
+            <div class="conclusion-item"><p><strong>3.</strong>  Educar con ética del cuidado significa mirar al otro con humanidad, comprender sus trayectorias y acompañarlo desde el respeto y la justicia.</p></div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="accordion-header" id="accordion-toggle">
+            <h2 class="section-title" style="margin-bottom:0; text-align: left;">📚 Referencias</h2>
+            <div class="accordion-icon">+</div>
+        </div>
+        <div class="accordion-content">
+            <ul>
+                <li> Colmenarejo, R. (2016). Enfoque de capacidades y sostenibilidad: Aportaciones de Amartya Sen y Martha Nussbaum. <em>Ideas y Valores, 65</em>(160), 121–149. <a href="https://doi.org/10.15446/ideasyvalores.v65n160.53730" target="_blank">Ver recurso</a></li>
+                <li> Guichot Reina, V. (2015). El «enfoque de las capacidades» de Martha Nussbaum y sus consecuencias educativas: Hacia una pedagogía socrática y pluralista. <em>Teoría de la Educación. Revista Interuniversitaria, 27</em>(2), 45–70. <a href="https://doi.org/10.14201/teoredu20152724570" target="_blank">Ver recurso</a></li>
+                <li> Ministerio de Educación Nacional. (2022). Política nacional de educación inclusiva. <a href="https://www.mineducacion.gov.co" target="_blank">Ver recurso</a></li>
+                <li> Skliar, C. (2002). ¡Ay! ¿por qué nos reformaremos tanto? Notas para una pedagogía (improbable) de la diferencia. Buenos Aires: Novedades Educativas.</li>
+                <li> UNESCO. (2020). Marco de acción Educación 2030: Hacia una educación inclusiva y equitativa de calidad. <a href="https://unesdoc.unesco.org/ark:/48223/pf0000245656" target="_blank">Ver recurso</a></li>
+            </ul>
+        </div>
+    </section>
+
+</div>
+
+<div id="modal-disc" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h2>🚫 Discriminación</h2><span class="close-btn" onclick="closeModal('modal-disc')">&times;</span></div>
+        <div class="modal-body">
+            <p> Es toda acción, verbal o estructural, que margina o invalida al otro por su raza, género, discapacidad, religión u orientación sexual, negándole el acceso equitativo a oportunidades de participación y aprendizaje. </p>
+            <div class="ejemplo"><p><strong>Ejemplo:</strong>  Un estudiante afrodescendiente es constantemente excluido de representaciones escolares por prejuicios estéticos.</p></div>
+            <p class="desafio"> Desafío Docente: Cuestionar estereotipos normalizados y crear ambientes donde las diferencias sean acogidas como riqueza.</p>
+        </div>
+    </div>
+</div>
+
+<div id="modal-excl" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h2>🚪 Exclusión</h2><span class="close-btn" onclick="closeModal('modal-excl')">&times;</span></div>
+        <div class="modal-body">
+            <p> Va más allá de negar el ingreso; implica restringir la participación activa de ciertos estudiantes.  A menudo se manifiesta de manera invisible, desatendiendo las necesidades de quienes aprenden distinto. </p>
+            <div class="ejemplo"><p><strong>Ejemplo:</strong>  No adaptar el material para un estudiante con discapacidad auditiva, obligándolo a seguir una clase oral sin apoyo visual.</p></div>
+            <p class="desafio"> Desafío Docente: Transitar de una enseñanza uniforme hacia una educación situada y flexible.</p>
+        </div>
+    </div>
+</div>
+
+<div id="modal-incl" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h2>🤝 Inclusión</h2><span class="close-btn" onclick="closeModal('modal-incl')">&times;</span></div>
+        <div class="modal-body">
+            <p> No es integrar a quienes son distintos, sino transformar la escuela para que todos y todas pertenezcan.  Es una apuesta política, ética y pedagógica que exige repensar las prácticas escolares. </p>
+            <div class="ejemplo"><p><strong>Ejemplo:</strong>  Usar metodologías activas y materiales multimodales que permitan la participación de estudiantes con diferentes estilos de aprendizaje.</p></div>
+            <p class="desafio"> Desafío Docente: Reconocer la diferencia como principio pedagógico y garantizar el derecho a aprender de todos.</p>
+        </div>
+    </div>
+</div>
+
+<div id="modal-etic" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h2>💖 Ética del Cuidado</h2><span class="close-btn" onclick="closeModal('modal-etic')">&times;</span></div>
+        <div class="modal-body">
+            <p> Es una educación basada en la reciprocidad, el afecto y la presencia genuina del docente.  Implica una atención constante a las necesidades del otro, reconociendo su vulnerabilidad. </p>
+            <div class="ejemplo"><p><strong>Ejemplo:</strong>  Un docente que detecta señales de violencia en el hogar de una estudiante y activa la ruta de atención sin exponerla.</p></div>
+            <p class="desafio"> Desafío Docente: Enseñar no solo desde el conocimiento, sino desde la sensibilidad, generando vínculos que favorezcan el bienestar integral.</p>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // --- SCROLL ANIMATIONS ---
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.2 });
+    document.querySelectorAll('.section').forEach(section => observer.observe(section));
+
+    // --- MODAL LOGIC ---
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'block';
+    }
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
+        }
+    }
+    
+    // --- ACCORDION LOGIC ---
+    const accordionToggle = document.getElementById('accordion-toggle');
+    accordionToggle.addEventListener('click', () => {
+        accordionToggle.classList.toggle('active');
+        const content = accordionToggle.nextElementSibling;
+        if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+        } else {
+            content.style.maxHeight = content.scrollHeight + 'px';
+        }
+    });
+
+</script>
+
+</body>
+</html>

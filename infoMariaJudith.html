@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infografía: Educación Inclusiva</title>
+    <style>
+        /* --- Fuentes y Estilos Globales --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --color-primario: #4e54c8;
+            --color-secundario: #8f94fb;
+            --color-acento-inclusion: #28a745;
+            --color-acento-discriminacion: #dc3545;
+            --color-acento-exclusion: #ffc107;
+            --color-acento-cuidado: #fd7e14;
+            --color-texto: #333;
+            --color-blanco: #ffffff;
+            --sombra-caja: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+            color: var(--color-texto);
+            overflow-x: hidden;
+            padding: 2rem 0;
+        }
+
+        /* --- Contenedor Principal --- */
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: var(--sombra-caja);
+        }
+
+        /* --- Encabezado --- */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--color-primario);
+            margin-bottom: 0.5rem;
+        }
+        
+        header .author {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-texto);
+            margin-top: -0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--color-texto);
+            font-style: italic;
+        }
+
+        /* --- Sección de Conceptos Clave --- */
+        .conceptos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .concepto-card {
+            background: var(--color-blanco);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            border-bottom: 5px solid;
+            opacity: 0;
+            position: relative;
+            animation: fadeInUp 0.5s ease-out forwards, pulse-shadow 2.5s infinite ease-in-out;
+        }
+        
+        .concepto-card:nth-child(1) { animation-delay: 0.2s; border-color: var(--color-acento-discriminacion); }
+        .concepto-card:nth-child(2) { animation-delay: 0.4s; border-color: var(--color-acento-exclusion); }
+        .concepto-card:nth-child(3) { animation-delay: 0.6s; border-color: var(--color-acento-inclusion); }
+        .concepto-card:nth-child(4) { animation-delay: 0.8s; border-color: var(--color-acento-cuidado); }
+
+        .concepto-card:hover {
+            transform: translateY(-10px);
+            animation-play-state: paused;
+        }
+        
+        /* Hint para invitar al clic (siempre visible) */
+        .concepto-card::before {
+            content: '👆 ¡Haz clic!';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--color-primario);
+            color: var(--color-blanco);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            opacity: 1;
+            transform: scale(1);
+            transition: transform 0.3s ease;
+        }
+        
+        .concepto-card:hover::before {
+            transform: scale(1.05); /* Ligero feedback al pasar el cursor */
+        }
+
+        .concepto-card .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .concepto-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        #discriminacion h2, #discriminacion .icon { color: var(--color-acento-discriminacion); }
+        #exclusion h2, #exclusion .icon { color: var(--color-acento-exclusion); }
+        #inclusion h2, #inclusion .icon { color: var(--color-acento-inclusion); }
+        #cuidado h2, #cuidado .icon { color: var(--color-acento-cuidado); }
+
+        /* --- Sección de Políticas --- */
+        .timeline-section {
+            margin-bottom: 3rem;
+            position: relative;
+            padding: 2rem 0;
+        }
+        .timeline-section h2 { text-align: center; margin-bottom: 2rem; font-size: 2rem; color: var(--color-primario); }
+
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: var(--color-secundario);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+            animation: slideIn 1s ease-out forwards;
+            opacity: 0;
+        }
+        .timeline-item.left { left: 0; transform: translateX(-100px); }
+        .timeline-item.right { left: 50%; transform: translateX(100px); }
+        
+        .timeline-item::after {
+            content: '🏛️';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            right: -17px;
+            top: 25px;
+            font-size: 1.8rem;
+            z-index: 1;
+        }
+        .timeline-item.right::after { left: -12px; }
+
+        .timeline-content {
+            padding: 20px 30px;
+            background-color: white;
+            position: relative;
+            border-radius: 6px;
+            box-shadow: var(--sombra-caja);
+        }
+        .timeline-content h3 { color: var(--color-primario); }
+
+        /* --- Sección Rol del Docente --- */
+        .rol-docente { text-align: center; margin-bottom: 3rem; }
+        .rol-docente h2 { font-size: 2rem; color: var(--color-primario); margin-bottom: 2rem; }
+        .rol-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .rol-item {
+            background: var(--color-blanco);
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: var(--sombra-caja);
+            font-weight: 600;
+            color: var(--color-primario);
+            transition: transform 0.3s, background-color 0.3s, color 0.3s;
+            cursor: default;
+        }
+        .rol-item:hover {
+            transform: scale(1.1);
+            background-color: var(--color-secundario);
+            color: var(--color-blanco);
+        }
+
+        /* --- Sección de Bibliografía --- */
+        .bibliografia {
+            text-align: left;
+            margin: 3rem 0;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+        }
+        .bibliografia h2 {
+            text-align: center;
+            color: var(--color-primario);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+        .bibliografia ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .bibliografia li {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 0.9rem;
+            padding-left: 2rem;
+            position: relative;
+        }
+        .bibliografia li::before {
+            content: '📚';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            font-size: 1.2rem;
+        }
+        .bibliografia a {
+            color: var(--color-primario);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .bibliografia a:hover {
+            color: var(--color-secundario);
+            text-decoration: underline;
+        }
+
+
+        /* --- Sección Final y Cita --- */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--color-primario);
+            color: var(--color-blanco);
+            border-radius: 0 0 20px 20px;
+            margin: 2rem -2rem -2rem -2rem;
+        }
+        footer h2 { font-size: 1.8rem; margin-bottom: 1rem; }
+        .acciones-lista { list-style: none; display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+        .acciones-lista li { background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 20px; }
+        .cita-clave { font-size: 1.3rem; font-style: italic; font-weight: 600; }
+        .cita-clave span { display: block; font-size: 1rem; margin-top: 0.5rem; font-weight: 400; }
+
+        /* --- Modal --- */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); animation: fadeIn 0.3s ease;
+        }
+        .modal-content {
+            background-color: #fefefe; margin: 10% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slideUp 0.4s ease-out; position: relative;
+        }
+        .close-btn {
+            color: #aaa; position: absolute; top: 15px; right: 25px; font-size: 28px; font-weight: bold; transition: color 0.3s;
+        }
+        .close-btn:hover, .close-btn:focus { color: black; text-decoration: none; cursor: pointer; }
+        .modal-body h3 { font-size: 1.8rem; margin-bottom: 1rem; }
+        .modal-body p { margin-bottom: 1rem; line-height: 1.6; }
+        .modal-body .ejemplo { background-color: #f0f0f0; padding: 1rem; border-radius: 8px; font-style: italic; }
+        .modal-body .reto { color: var(--color-primario); font-weight: 600; }
+
+        /* --- Animaciones --- */
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideIn { from { opacity: 0; } to { opacity: 1; transform: translateX(0); } }
+        @keyframes pulse-shadow {
+            0% { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); }
+            50% { box-shadow: 0 10px 35px rgba(78, 84, 200, 0.3); }
+            100% { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); }
+        }
+
+        /* --- Responsividad --- */
+        @media (max-width: 768px) {
+            header h1 { font-size: 2rem; }
+            .timeline::after { left: 31px; }
+            .timeline-item { width: 100%; padding-left: 70px; padding-right: 25px; }
+            .timeline-item.left, .timeline-item.right { left: 0%; transform: translateX(0); margin-bottom: 2rem; }
+            .timeline-item::after { left: 15px; }
+            .modal-content { width: 90%; margin: 20% auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Educación Inclusiva: Una Mirada Ética y Práctica</h1>
+            <p class="author">Autora: María Judith Méndez Jiménez </p>
+            <p>Comprendiendo la discriminación, la exclusión, la inclusión y la ética del cuidado</p>
+        </header>
+
+        <section class="conceptos-grid">
+            <div class="concepto-card" id="discriminacion" onclick="openModal('modal-discriminacion')">
+                <div class="icon">⚖️</div>
+                <h2>🔴 Discriminación</h2>
+                <p>Práctica que niega o limita derechos a personas o grupos. </p>
+            </div>
+            <div class="concepto-card" id="exclusion" onclick="openModal('modal-exclusion')">
+                <div class="icon">🚪</div>
+                <h2>🚫 Exclusión</h2>
+                <p>Proceso que margina a estudiantes del sistema educativo. </p>
+            </div>
+            <div class="concepto-card" id="inclusion" onclick="openModal('modal-inclusion')">
+                <div class="icon">🧩</div>
+                <h2>🟢 Inclusión</h2>
+                <p>Reconocimiento y valoración activa de la diversidad en el aula. </p>
+            </div>
+            <div class="concepto-card" id="cuidado" onclick="openModal('modal-cuidado')">
+                <div class="icon">💞</div>
+                <h2>💖 Ética del Cuidado</h2>
+                <p>Enfoque centrado en las relaciones empáticas y el respeto. </p>
+            </div>
+        </section>
+
+        <section class="timeline-section">
+            <h2>🏛️ Políticas Poblacionales en Colombia: Recorrido Histórico</h2>
+            <div class="timeline">
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <h3>1994 - Ley 115</h3>
+                        <p>La Ley General de Educación sienta las bases para un sistema más inclusivo. </p>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <h3>2017 - Decreto 1421</h3>
+                        <p>Reglamenta la atención educativa a estudiantes con discapacidad, buscando equidad. </p>
+                    </div>
+                </div>
+                 <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <h3>Visión Actual</h3>
+                        <p>Se busca superar la homogeneidad y avanzar hacia un modelo centrado en capacidades, como lo plantea Martha Nussbaum. </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="rol-docente">
+            <h2>👨‍🏫 El Rol del Docente en la Educación Inclusiva</h2>
+            <div class="rol-grid">
+                <span class="rol-item">✨ Mediador de aprendizajes diversos </span>
+                <span class="rol-item">🤝 Agente ético que cuida y acompaña </span>
+                <span class="rol-item">🎨 Promotor de una pedagogía de la diferencia </span>
+                <span class="rol-item">🏛️ Diseñador de ambientes accesibles </span>
+                <span class="rol-item">✊ Actor político que transforma </span>
+            </div>
+        </section>
+
+        <section class="bibliografia">
+            <h2>📚 Referencias Bibliográficas</h2>
+            <ul>
+                <li>Colmenarejo, R. (2016). Enfoque de capacidades y sostenibilidad. Aportaciones de Amartya Sen y Martha Nussbaum. <em>Ideas y Valores, 65</em>(160), 121–149.  <a href="https://doi.org/10.15446/ideasyvalores.v65n160.56191" target="_blank" rel="noopener noreferrer">Ver recurso</a></li>
+                <li>Guichot Reina, V. (2015). El «enfoque de las capacidades» de Martha Nussbaum y sus consecuencias educativas: Hacia una pedagogía socrática y pluralista. <em>Teoría de la Educación. Revista Interuniversitaria, 27</em>(2), 45–70.  <a href="https://doi.org/10.14201/teoredu20152724570" target="_blank" rel="noopener noreferrer">Ver recurso</a></li>
+                <li>Ley 115 de 1994. (1994). Ley general de educación. Congreso de la República de Colombia.  <a href="https://www.mineducacion.gov.co/1621/articles-85906_archivo_pdf.pdf" target="_blank" rel="noopener noreferrer">Ver recurso</a></li>
+                <li>Decreto 1421 de 2017. (2017). Por el cual se reglamenta la atención educativa a la población con discapacidad en el marco de la educación inclusiva. Ministerio de Educación Nacional.  <a href="https://www.mineducacion.gov.co/1759/articles-361151_recurso_1.pdf" target="_blank" rel="noopener noreferrer">Ver recurso</a></li>
+                <li>Skliar, C. (2002). ¡Ay! ¿por qué nos reformaremos tanto? Notas para una pedagogía (improbable) de la diferencia. Buenos Aires: Novedades Educativas. </li>
+            </ul>
+        </section>
+        
+    </div>
+    
+    <footer>
+        <h2>🛠️ ¿Cómo Construimos una Escuela Inclusiva?</h2>
+        <ul class="acciones-lista">
+            <li>💡 Usar estrategias pedagógicas situadas </li>
+            <li>💖 Valorar la diferencia como riqueza </li>
+            <li>🌍 Promover el diálogo intercultural </li>
+            <li>👂 Cuidar, escuchar, adaptar y transformar </li>
+        </ul>
+        <p class="cita-clave">
+            “La educación inclusiva no es un lugar, es una actitud”
+            <span>(Skliar, 2002) </span>
+        </p>
+    </footer>
+
+    <div id="modal-discriminacion" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-discriminacion')">&times;</span>
+            <div class="modal-body">
+                <h3 style="color: var(--color-acento-discriminacion);">🔴 Discriminación</h3>
+                <p><strong>Definición:</strong> Práctica o actitud que niega o limita derechos a personas o grupos por su raza, género, orientación sexual, capacidad o condición social (Guichot Reina, 2015). </p>
+                <div class="ejemplo"><p><strong>Ejemplo en el aula:</strong> Cuando un docente da más participación a niños que a niñas en clase de ciencias. </p></div>
+                <p class="reto"><strong>Reto:</strong> Desmontar prejuicios que operan de forma inconsciente en las prácticas pedagógicas. </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-exclusion" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-exclusion')">&times;</span>
+            <div class="modal-body">
+                <h3 style="color: var(--color-acento-exclusion);">🚫 Exclusión</h3>
+                <p><strong>Definición:</strong> Proceso por el cual ciertos estudiantes son marginados del sistema educativo, ya sea por razones estructurales o simbólicas (Colmenarejo, 2016). </p>
+                <div class="ejemplo"><p><strong>Ejemplo en el aula:</strong> Un estudiante con discapacidad motora que no puede participar porque el aula no es accesible. </p></div>
+                <p class="reto"><strong>Reto:</strong> Diseñar espacios y materiales accesibles para todos. </p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal-inclusion" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-inclusion')">&times;</span>
+            <div class="modal-body">
+                <h3 style="color: var(--color-acento-inclusion);">🟢 Inclusión</h3>
+                <p><strong>Definición:</strong> Reconocimiento y valoración activa de la diversidad en el aula, generando igualdad de oportunidades y participación (Skliar, 2002). </p>
+                <div class="ejemplo"><p><strong>Ejemplo en el aula:</strong> Ajustar una actividad para que estudiantes con diferentes niveles puedan participar. </p></div>
+                <p class="reto"><strong>Reto:</strong> Pasar del discurso a una pedagogía realmente inclusiva. </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-cuidado" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-cuidado')">&times;</span>
+            <div class="modal-body">
+                <h3 style="color: var(--color-acento-cuidado);">💖 Ética del Cuidado</h3>
+                <p><strong>Definición:</strong> Enfoque centrado en las relaciones empáticas, el respeto y la atención a las necesidades del otro como eje de la acción educativa (Noddings, citada por Guichot Reina, 2015). </p>
+                <div class="ejemplo"><p><strong>Ejemplo en el aula:</strong> Un docente que prioriza la escucha activa y el acompañamiento emocional. </p></div>
+                <p class="reto"><strong>Reto:</strong> Equilibrar las exigencias curriculares con una pedagogía sensible. </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(modalId) { document.getElementById(modalId).style.display = "block"; }
+        function closeModal(modalId) { document.getElementById(modalId).style.display = "none"; }
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) { modals[i].style.display = "none"; }
+            }
+        }
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    if(entry.target.classList.contains('timeline-item')) { entry.target.style.transform = 'translateX(0)'; }
+                    if(entry.target.classList.contains('concepto-card')) { entry.target.style.transform = 'translateY(0)'; }
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.timeline-item').forEach(el => { observer.observe(el); });
+    </script>
+
+</body>
+</html>

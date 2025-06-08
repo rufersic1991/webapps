@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infografía Dinámica: Educación Inclusiva</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --bg-color: #1a1a2e;
+            --card-color: #16213e;
+            --primary-accent: #0f3460;
+            --secondary-accent: #e94560;
+            --text-color: #dcdcdc;
+            --header-color: #ffffff;
+            --glow-color: rgba(233, 69, 96, 0.7);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 1rem;
+        }
+
+        /* --- Header --- */
+        .header {
+            text-align: center;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+        .header h1 {
+            font-size: 3rem;
+            color: var(--header-color);
+            font-weight: 700;
+            animation: text-flicker 3s linear infinite alternate;
+        }
+        .header .author {
+            font-size: 1.2rem;
+            color: var(--secondary-accent);
+            font-weight: 600;
+        }
+
+        /* --- Estilo de Sección General --- */
+        .section {
+            background-color: var(--card-color);
+            border: 1px solid var(--primary-accent);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .section h2 {
+            font-size: 2rem;
+            color: var(--header-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* --- Tarjetas Giratorias 3D --- */
+        .flip-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        .flip-card {
+            background-color: transparent;
+            height: 300px;
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            border: 2px solid var(--primary-accent);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+        .flip-card-front {
+            background-color: var(--primary-accent);
+            animation: pulse-glow 2s infinite alternate;
+        }
+        .flip-card-back {
+            background-color: var(--secondary-accent);
+            color: white;
+            transform: rotateY(180deg);
+            font-size: 0.9rem;
+        }
+        .flip-card-front .icon { font-size: 4rem; }
+        .flip-card-front h3 { font-size: 1.5rem; margin: 1rem 0; }
+        .flip-card-front .hint { font-size: 0.9rem; font-style: italic; opacity: 0.8; }
+
+        /* --- Rol del Docente con Iconos Giratorios --- */
+        .rol-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+        }
+        .rol-item {
+            text-align: center;
+            max-width: 150px;
+        }
+        .rol-item .icon {
+            font-size: 3rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            animation: spin 8s linear infinite;
+        }
+        .rol-item p { font-weight: 600; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* --- Bibliografía Acordeón --- */
+        .accordion-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .accordion-header .icon {
+            font-size: 2rem;
+            transition: transform 0.4s ease;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+            font-size: 0.9rem;
+        }
+        .accordion-content ul { list-style-type: none; padding-top: 1.5rem; }
+        .accordion-content li { margin-bottom: 1rem; }
+        .accordion-content a { color: var(--secondary-accent); font-weight: 600; text-decoration: none; }
+        .accordion-header.active .icon { transform: rotate(45deg); }
+
+        /* --- Cita Final con Efecto Escritura --- */
+        .quote-wrapper {
+            border-left: 5px solid var(--secondary-accent);
+            padding-left: 1.5rem;
+            font-size: 1.5rem;
+            font-style: italic;
+        }
+        .typing-effect {
+            width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 4s steps(40, end) forwards;
+        }
+        .quote-wrapper span { display: block; font-size: 1rem; text-align: right; margin-top: 0.5rem; }
+        
+        /* --- Animaciones y Keyframes --- */
+        @keyframes text-flicker {
+            from { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px var(--glow-color); }
+            to { text-shadow: none; }
+        }
+        @keyframes pulse-glow {
+            from { box-shadow: 0 0 10px 0px var(--glow-color); }
+            to { box-shadow: 0 0 25px 10px transparent; }
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header class="header">
+        <h1>Educación Inclusiva Dinámica</h1>
+        <p class="author">Basado en el trabajo de: Oscar Javier Lozano</p>
+    </header>
+
+    <section class="section">
+        <h2>🔑 Conceptos Clave</h2>
+        <div class="flip-card-grid">
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <span class="icon">🔴</span>
+                        <h3>Discriminación</h3>
+                        <p class="hint">🔄 Pasa el cursor para girar</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <p><strong>Definición:</strong> Práctica que niega o limita derechos por características específicas.</p>
+                        <p><strong>Ejemplo:</strong> Dar más participación a niños que a niñas en ciencias.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <span class="icon">🚫</span>
+                        <h3>Exclusión</h3>
+                        <p class="hint">🔄 Pasa el cursor para girar</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <p><strong>Definición:</strong> Proceso que margina a estudiantes del sistema educativo.</p>
+                        <p><strong>Ejemplo:</strong> Un aula no accesible para un estudiante con discapacidad motora.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <span class="icon">🧩</span>
+                        <h3>Inclusión</h3>
+                        <p class="hint">🔄 Pasa el cursor para girar</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <p><strong>Definición:</strong> Valoración activa de la diversidad para generar igualdad de oportunidades.</p>
+                        <p><strong>Ejemplo:</strong> Ajustar actividades para que todos puedan participar.</p>
+                    </div>
+                </div>
+            </div>
+             <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <span class="icon">💖</span>
+                        <h3>Ética del Cuidado</h3>
+                        <p class="hint">🔄 Pasa el cursor para girar</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <p><strong>Definición:</strong> Enfoque centrado en la empatía, el respeto y la atención al otro.</p>
+                        <p><strong>Ejemplo:</strong> Priorizar la escucha activa y el acompañamiento emocional.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>👨‍🏫 El Rol del Docente</h2>
+        <div class="rol-grid">
+            <div class="rol-item"><span class="icon">✨</span><p>Mediador</p></div>
+            <div class="rol-item"><span class="icon">🤝</span><p>Agente Ético</p></div>
+            <div class="rol-item"><span class="icon">🎨</span><p>Promotor</p></div>
+            <div class="rol-item"><span class="icon">🏛️</span><p>Diseñador</p></div>
+            <div class="rol-item"><span class="icon">✊</span><p>Actor Político</p></div>
+        </div>
+    </section>
+    
+    <section class="section">
+        <div id="accordion" class="accordion-header">
+            <h2>📚 Referencias Bibliográficas</h2>
+            <span class="icon">+</span>
+        </div>
+        <div class="accordion-content">
+            <ul>
+                <li>Colmenarejo, R. (2016). Enfoque de capacidades y sostenibilidad. <em>Ideas y Valores</em>. <a href="https://doi.org/10.15446/ideasyvalores.v65n160.56191" target="_blank">Ver recurso</a></li>
+                <li>Guichot Reina, V. (2015). El «enfoque de las capacidades» de Martha Nussbaum. <em>Teoría de la Educación</em>. <a href="https://doi.org/10.14201/teoredu20152724570" target="_blank">Ver recurso</a></li>
+                <li>Ley 115 de 1994. Ley general de educación. <a href="https://www.mineducacion.gov.co/1621/articles-85906_archivo_pdf.pdf" target="_blank">Ver recurso</a></li>
+                <li>Decreto 1421 de 2017. Atención educativa a la población con discapacidad. <a href="https://www.mineducacion.gov.co/1759/articles-361151_recurso_1.pdf" target="_blank">Ver recurso</a></li>
+                <li>Skliar, C. (2002). <em>Notas para una pedagogía (improbable) de la diferencia</em>.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="quote-wrapper">
+            <p class="typing-effect">“La educación inclusiva no es un lugar, es una actitud”</p>
+            <span>- Skliar (2002)</span>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // Script para animaciones al hacer scroll
+    const sections = document.querySelectorAll('.section');
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+
+    // Script para el acordeón de la bibliografía
+    const accordion = document.getElementById('accordion');
+    accordion.addEventListener('click', function() {
+        this.classList.toggle('active');
+        const content = this.nextElementSibling;
+        if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+        } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+        }
+    });
+
+</script>
+
+</body>
+</html>
