@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optimizador de Video Profesional</title>
+    <title>Compresor de Video Avanzado</title>
     
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
-
     <style>
         :root {
             --color-primario: #007bff;
@@ -78,6 +76,19 @@
             border-radius: 8px; 
             margin-top: 20px;
             border-left: 4px solid var(--color-info);
+        }
+
+        .compatibility-check {
+            background: rgba(255, 193, 7, 0.15);
+            border: 1px solid var(--color-warning);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .compatibility-check.show {
+            display: block;
         }
 
         .section { 
@@ -164,7 +175,7 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
         
-        #crfValue { 
+        #qualityValue { 
             font-weight: bold; 
             color: var(--color-primario); 
             min-width: 30px; 
@@ -237,21 +248,6 @@
             border-radius: 4px;
         }
 
-        #log-output {
-            background: #0a0a0a;
-            color: #00ff00;
-            padding: 20px;
-            border-radius: 8px;
-            height: 250px;
-            overflow-y: auto;
-            font-family: var(--font-mono);
-            font-size: 0.85em;
-            white-space: pre-wrap;
-            word-break: break-all;
-            border: 1px solid rgba(0, 255, 0, 0.2);
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
-        }
-
         #video-preview { 
             max-width: 100%; 
             border-radius: 12px; 
@@ -318,6 +314,16 @@
             margin-top: 15px;
         }
 
+        .fallback-message {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--color-warning);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--color-warning);
+            margin-top: 15px;
+            text-align: center;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -356,18 +362,23 @@
 
     <div class="container">
         <header>
-            <h1>Optimizador de Video Profesional</h1>
-            <p>Comprime tus videos directamente en el navegador con tecnología FFmpeg.</p>
+            <h1>Compresor de Video Avanzado</h1>
+            <p>Optimiza tus videos directamente en el navegador usando Canvas API</p>
             <div class="warning">
-                <strong>🔒 100% Privado!</strong> El proceso ocurre completamente en tu dispositivo. Tus videos nunca salen de tu computador.
+                <strong>🔒 100% Privado!</strong> Todo el procesamiento ocurre en tu dispositivo. Tus videos nunca salen de tu computador.
             </div>
         </header>
+
+        <div class="compatibility-check" id="compatibilityCheck">
+            <strong>⚠️ Información de Compatibilidad:</strong><br>
+            <span id="compatibilityMessage"></span>
+        </div>
 
         <main>
             <div class="section" id="upload-section">
                 <h2>📁 1. Sube tu video</h2>
                 <div class="form-group">
-                    <label for="video-uploader">Selecciona un archivo de video (MP4, MOV, AVI, MKV, etc.)</label>
+                    <label for="video-uploader">Selecciona un archivo de video (MP4, WebM, etc.)</label>
                     <input type="file" id="video-uploader" accept="video/*">
                 </div>
                 <div id="file-info" style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;"></div>
@@ -379,31 +390,29 @@
                     <label for="resolution">Resolución de salida</label>
                     <select id="resolution">
                         <option value="original">🎯 Mantener Original</option>
-                        <option value="1080">📺 1080p (Full HD) - Recomendado</option>
-                        <option value="720">📱 720p (HD) - Móviles</option>
-                        <option value="480">💾 480p (Estándar) - Menor tamaño</option>
-                        <option value="360">🔧 360p (Compacto) - Máxima compresión</option>
+                        <option value="1080">📺 1080p (Full HD)</option>
+                        <option value="720" selected>📱 720p (HD) - Recomendado</option>
+                        <option value="480">💾 480p (Estándar)</option>
+                        <option value="360">🔧 360p (Compacto)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="crf">Calidad de video (CRF)</label>
+                    <label for="quality">Calidad de compresión</label>
                     <div class="slider-group">
-                        <span style="font-size: 0.9em;">Alta</span>
-                        <input type="range" id="crf" min="18" max="32" value="23" step="1">
                         <span style="font-size: 0.9em;">Baja</span>
-                        <span id="crfValue">23</span>
+                        <input type="range" id="quality" min="0.1" max="1.0" value="0.7" step="0.1">
+                        <span style="font-size: 0.9em;">Alta</span>
+                        <span id="qualityValue">0.7</span>
                     </div>
                     <div style="font-size: 0.85em; opacity: 0.7; margin-top: 8px;">
-                        18-22: Calidad muy alta | 23-25: Calidad buena | 26-32: Calidad básica
+                        0.1-0.4: Máxima compresión | 0.5-0.7: Balanceado | 0.8-1.0: Alta calidad
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="preset">Velocidad de procesamiento</label>
-                    <select id="preset">
-                        <option value="ultrafast">⚡ Ultra rápido (menor compresión)</option>
-                        <option value="faster" selected>🚀 Rápido (recomendado)</option>
-                        <option value="fast">⏱️ Moderado</option>
-                        <option value="medium">🎯 Balanceado (mejor compresión)</option>
+                    <label for="format">Formato de salida</label>
+                    <select id="format">
+                        <option value="webm">WebM (Mejor compresión)</option>
+                        <option value="mp4" selected>MP4 (Más compatible)</option>
                     </select>
                 </div>
             </div>
@@ -418,7 +427,6 @@
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
-                <pre id="log-output"></pre>
             </div>
 
             <div class="results-area" id="resultsArea">
@@ -436,30 +444,62 @@
     </div>
 
     <script>
-        const { createFFmpeg, fetchFile } = FFmpeg;
-        let ffmpeg = null;
         let isProcessing = false;
+        let mediaRecorder;
+        let recordedChunks = [];
 
         // Referencias al DOM
         const uploader = document.getElementById('video-uploader');
         const fileInfo = document.getElementById('file-info');
         const resolutionSelect = document.getElementById('resolution');
-        const crfSlider = document.getElementById('crf');
-        const crfValueSpan = document.getElementById('crfValue');
-        const presetSelect = document.getElementById('preset');
+        const qualitySlider = document.getElementById('quality');
+        const qualityValueSpan = document.getElementById('qualityValue');
+        const formatSelect = document.getElementById('format');
         const compressBtn = document.getElementById('compressBtn');
         const progressArea = document.getElementById('progressArea');
         const resultsArea = document.getElementById('resultsArea');
         const status = document.getElementById('status');
         const progressFill = document.getElementById('progressFill');
-        const logOutput = document.getElementById('log-output');
         const videoPreview = document.getElementById('video-preview');
         const downloadBtn = document.getElementById('downloadBtn');
         const statsGrid = document.getElementById('statsGrid');
+        const compatibilityCheck = document.getElementById('compatibilityCheck');
+        const compatibilityMessage = document.getElementById('compatibilityMessage');
 
-        // Actualizar valor del CRF
-        crfSlider.addEventListener('input', (e) => {
-            crfValueSpan.textContent = e.target.value;
+        // Verificar compatibilidad
+        function checkCompatibility() {
+            const issues = [];
+            
+            if (!('MediaRecorder' in window)) {
+                issues.push('MediaRecorder API no soportada');
+            }
+            
+            if (!('HTMLCanvasElement' in window)) {
+                issues.push('Canvas API no soportada');
+            }
+            
+            const canvas = document.createElement('canvas');
+            if (!canvas.getContext) {
+                issues.push('Canvas Context no soportado');
+            }
+            
+            if (issues.length > 0) {
+                compatibilityCheck.classList.add('show');
+                compatibilityMessage.innerHTML = `
+                    Tu navegador no soporta algunas características necesarias:<br>
+                    • ${issues.join('<br>• ')}<br><br>
+                    <strong>Recomendación:</strong> Usa Chrome, Firefox o Edge actualizados.
+                `;
+                compressBtn.disabled = true;
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Actualizar valor de calidad
+        qualitySlider.addEventListener('input', (e) => {
+            qualityValueSpan.textContent = e.target.value;
         });
 
         // Mostrar información del archivo
@@ -475,13 +515,6 @@
             }
         });
 
-        // Función para formatear tiempo
-        const formatTime = (seconds) => {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        };
-
         // Función para formatear bytes
         const formatBytes = (bytes) => {
             if (bytes === 0) return '0 Bytes';
@@ -491,42 +524,152 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         };
 
+        // Función para formatear tiempo
+        const formatTime = (seconds) => {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        };
+
         // Función para actualizar progreso
         const updateProgress = (percentage) => {
             progressFill.style.width = `${percentage}%`;
         };
 
-        // Inicializar FFmpeg
-        const initializeFFmpeg = async () => {
-            if (!ffmpeg) {
-                ffmpeg = createFFmpeg({
-                    log: true,
-                    corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+        // Función para obtener dimensiones del video
+        const getVideoDimensions = (video) => {
+            return new Promise((resolve) => {
+                video.addEventListener('loadedmetadata', () => {
+                    resolve({
+                        width: video.videoWidth,
+                        height: video.videoHeight,
+                        duration: video.duration
+                    });
                 });
-                
-                ffmpeg.setLogger(({ type, message }) => {
-                    if (type === 'info') {
-                        logOutput.textContent += message + '\n';
-                        logOutput.scrollTop = logOutput.scrollHeight;
-                        
-                        // Extraer progreso del log
-                        const timeMatch = message.match(/time=(\d{2}):(\d{2}):(\d{2}\.\d{2})/);
-                        if (timeMatch && window.videoDuration) {
-                            const hours = parseInt(timeMatch[1]);
-                            const minutes = parseInt(timeMatch[2]);
-                            const seconds = parseFloat(timeMatch[3]);
-                            const currentTime = hours * 3600 + minutes * 60 + seconds;
-                            const progress = (currentTime / window.videoDuration) * 100;
-                            updateProgress(Math.min(progress, 100));
-                        }
-                    }
-                });
+            });
+        };
 
-                await ffmpeg.load();
+        // Función para calcular nuevas dimensiones
+        const calculateDimensions = (originalWidth, originalHeight, targetHeight) => {
+            if (targetHeight === 'original') {
+                return { width: originalWidth, height: originalHeight };
             }
+            
+            const aspectRatio = originalWidth / originalHeight;
+            const newHeight = parseInt(targetHeight);
+            const newWidth = Math.round(newHeight * aspectRatio);
+            
+            // Asegurar que las dimensiones sean pares (requerido por algunos codecs)
+            return {
+                width: newWidth % 2 === 0 ? newWidth : newWidth + 1,
+                height: newHeight % 2 === 0 ? newHeight : newHeight + 1
+            };
         };
 
         // Función principal de compresión
+        const compressVideo = async (file) => {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const video = document.createElement('video');
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    video.src = URL.createObjectURL(file);
+                    video.muted = true;
+                    video.playsInline = true;
+                    
+                    // Esperar a que el video se cargue
+                    const { width, height, duration } = await getVideoDimensions(video);
+                    
+                    // Calcular nuevas dimensiones
+                    const targetResolution = resolutionSelect.value;
+                    const { width: newWidth, height: newHeight } = calculateDimensions(width, height, targetResolution);
+                    
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+                    
+                    // Configurar MediaRecorder
+                    const stream = canvas.captureStream(30); // 30 FPS
+                    const quality = parseFloat(qualitySlider.value);
+                    const format = formatSelect.value;
+                    
+                    const mimeType = format === 'webm' ? 'video/webm;codecs=vp9' : 'video/mp4;codecs=h264';
+                    
+                    // Verificar soporte del codec
+                    if (!MediaRecorder.isTypeSupported(mimeType)) {
+                        // Fallback a codecs más básicos
+                        const fallbackType = format === 'webm' ? 'video/webm' : 'video/mp4';
+                        if (MediaRecorder.isTypeSupported(fallbackType)) {
+                            mediaRecorder = new MediaRecorder(stream, { 
+                                mimeType: fallbackType,
+                                videoBitsPerSecond: 1000000 * quality // Bitrate basado en calidad
+                            });
+                        } else {
+                            throw new Error('Formato de video no soportado por este navegador');
+                        }
+                    } else {
+                        mediaRecorder = new MediaRecorder(stream, { 
+                            mimeType: mimeType,
+                            videoBitsPerSecond: 1000000 * quality
+                        });
+                    }
+                    
+                    recordedChunks = [];
+                    
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            recordedChunks.push(event.data);
+                        }
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        const blob = new Blob(recordedChunks, { 
+                            type: format === 'webm' ? 'video/webm' : 'video/mp4' 
+                        });
+                        resolve(blob);
+                    };
+                    
+                    mediaRecorder.onerror = (event) => {
+                        reject(new Error('Error en MediaRecorder: ' + event.error));
+                    };
+                    
+                    // Iniciar grabación
+                    mediaRecorder.start(100); // Chunk cada 100ms
+                    
+                    // Reproducir y dibujar frames
+                    let startTime = Date.now();
+                    
+                    const drawFrame = () => {
+                        if (video.currentTime >= duration) {
+                            mediaRecorder.stop();
+                            return;
+                        }
+                        
+                        // Dibujar frame actual en el canvas
+                        ctx.drawImage(video, 0, 0, newWidth, newHeight);
+                        
+                        // Actualizar progreso
+                        const progress = (video.currentTime / duration) * 100;
+                        updateProgress(progress);
+                        
+                        // Continuar con el siguiente frame
+                        requestAnimationFrame(drawFrame);
+                    };
+                    
+                    // Iniciar reproducción
+                    video.addEventListener('playing', () => {
+                        drawFrame();
+                    });
+                    
+                    await video.play();
+                    
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        };
+
+        // Evento del botón de compresión
         compressBtn.addEventListener('click', async () => {
             const file = uploader.files[0];
             if (!file) {
@@ -546,84 +689,29 @@
             compressBtn.classList.add('processing');
             resultsArea.style.display = 'none';
             progressArea.style.display = 'block';
-            logOutput.textContent = '';
             updateProgress(0);
 
             const originalSize = file.size;
             const startTime = Date.now();
 
             try {
-                // Paso 1: Inicializar FFmpeg
-                status.textContent = '🔧 Inicializando motor de video FFmpeg...';
-                await initializeFFmpeg();
-                updateProgress(10);
-
-                // Paso 2: Cargar archivo
-                status.textContent = '📂 Cargando archivo en memoria...';
-                const inputFileName = `input.${file.name.split('.').pop()}`;
-                const outputFileName = 'output.mp4';
+                status.textContent = '🎬 Procesando video (esto puede tomar varios minutos)...';
                 
-                ffmpeg.FS('writeFile', inputFileName, await fetchFile(file));
-                updateProgress(20);
-
-                // Obtener información del video (opcional)
-                status.textContent = '📊 Analizando propiedades del video...';
-                updateProgress(25);
-
-                // Paso 3: Configurar comando de compresión
-                status.textContent = '⚙️ Configurando parámetros de compresión...';
+                const compressedBlob = await compressVideo(file);
                 
-                const command = ['-i', inputFileName];
-                
-                // Configurar resolución
-                const resolution = resolutionSelect.value;
-                if (resolution !== 'original') {
-                    command.push('-vf', `scale=-2:${resolution}`);
-                }
-                
-                // Configurar codec y calidad
-                const crf = crfSlider.value;
-                const preset = presetSelect.value;
-                
-                command.push(
-                    '-c:v', 'libx264',
-                    '-crf', crf,
-                    '-preset', preset,
-                    '-c:a', 'aac',
-                    '-b:a', '128k',
-                    '-movflags', '+faststart', // Optimización para streaming
-                    '-y', // Sobrescribir archivo de salida
-                    outputFileName
-                );
-                
-                logOutput.textContent += `🔨 Comando FFmpeg:\nffmpeg ${command.join(' ')}\n\n`;
-                updateProgress(30);
-
-                // Paso 4: Ejecutar compresión
-                status.textContent = '🎬 Comprimiendo video... (esto puede tomar varios minutos)';
-                
-                await ffmpeg.run(...command);
-                updateProgress(90);
-
-                // Paso 5: Generar resultado
-                status.textContent = '📦 Generando archivo final...';
-                const data = ffmpeg.FS('readFile', outputFileName);
-                
-                // Limpiar archivos temporales
-                ffmpeg.FS('unlink', inputFileName);
-                ffmpeg.FS('unlink', outputFileName);
-                
-                const blob = new Blob([data], { type: 'video/mp4' });
-                const url = URL.createObjectURL(blob);
-                
+                // Generar resultado
+                const url = URL.createObjectURL(compressedBlob);
                 videoPreview.src = url;
                 downloadBtn.href = url;
-                downloadBtn.download = `${file.name.split('.')[0]}_comprimido.mp4`;
+                
+                const format = formatSelect.value;
+                const fileName = file.name.split('.')[0];
+                downloadBtn.download = `${fileName}_comprimido.${format}`;
                 
                 // Calcular estadísticas
                 const endTime = Date.now();
                 const processingTime = (endTime - startTime) / 1000;
-                const newSize = blob.size;
+                const newSize = compressedBlob.size;
                 const reduction = ((originalSize - newSize) / originalSize * 100).toFixed(1);
                 const compressionRatio = (originalSize / newSize).toFixed(2);
                 
@@ -650,8 +738,8 @@
                         <div>Tiempo de Proceso</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">CRF ${crf}</div>
-                        <div>Calidad Aplicada</div>
+                        <div class="stat-value">${resolutionSelect.value}</div>
+                        <div>Resolución</div>
                     </div>
                 `;
 
@@ -663,13 +751,11 @@
                 if ('Notification' in window && Notification.permission === 'granted') {
                     new Notification('✅ Video comprimido exitosamente', {
                         body: `Reducción del ${reduction}% en tamaño`,
-                        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="green"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
                     });
                 }
 
             } catch (error) {
                 console.error('Error durante la compresión:', error);
-                logOutput.textContent += `\n\n❌ ERROR CRÍTICO:\n${error.message || error}\n`;
                 
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'error-message';
@@ -679,8 +765,8 @@
                     <strong>Posibles soluciones:</strong><br>
                     • Verifica que el archivo sea un video válido<br>
                     • Prueba con un archivo más pequeño<br>
-                    • Recarga la página e intenta nuevamente<br>
-                    • Verifica tu conexión a internet para cargar FFmpeg
+                    • Intenta con otro formato de salida<br>
+                    • Usa un navegador más reciente (Chrome, Firefox, Edge)
                 `;
                 
                 progressArea.appendChild(errorDiv);
@@ -707,6 +793,11 @@
                 e.preventDefault();
                 e.returnValue = '⚠️ Se está procesando un video. ¿Estás seguro de que quieres salir?';
             }
+        });
+
+        // Verificar compatibilidad al cargar
+        window.addEventListener('DOMContentLoaded', () => {
+            checkCompatibility();
         });
 
     </script>
