@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Optimizador de Video Profesional</title>
     
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+    <script src="./ffmpeg/ffmpeg.min.js"></script>
 
     <style>
         :root {
@@ -201,7 +201,8 @@
             if (!ffmpeg || !ffmpeg.isLoaded()) {
                 ffmpeg = createFFmpeg({
                     log: true,
-                    corePath: 'https://unpkg.com/@ffmpeg/ffmpeg-core@0.11.0/dist/ffmpeg-core.js',
+                    // CAMBIO 2: Se apunta a la copia local del núcleo de ffmpeg
+                    corePath: './ffmpeg/ffmpeg-core.js',
                 });
                 ffmpeg.setLogger(({ type, message }) => {
                     if (type !== 'info') {
