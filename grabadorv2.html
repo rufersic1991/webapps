@@ -580,7 +580,9 @@
                 ctx.strokeStyle = "#6366f1"; ctx.lineWidth = Math.max(3, canvas.width * 0.005); ctx.stroke();
             }
 
-            animationFrameId = requestAnimationFrame(drawFrame);
+            // CORRECCIÓN: Usar setTimeout en lugar de requestAnimationFrame para asegurar fotogramas
+            // incluso si el usuario minimiza el navegador (Mobile-Friendly)
+            animationFrameId = setTimeout(drawFrame, 33); // Aprox 30 FPS constantes
         }
 
         // --- SISTEMA DE GRABACIÓN ---
@@ -596,27 +598,43 @@
             const stream = canvas.captureStream(30);
             if (micStream && micStream.getAudioTracks().length > 0) stream.addTrack(micStream.getAudioTracks()[0]);
 
-            // Configurar MediaRecorder
-            const types = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'];
+            // Configurar MediaRecorder de manera más segura y compatible (Especial para móviles)
+            const types = ['video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
             let options = {};
+            let selectedMimeType = 'video/webm'; // Fallback por defecto
+            
             for (let t of types) {
-                if (MediaRecorder.isTypeSupported(t)) { options = { mimeType: t, videoBitsPerSecond: 2500000 }; break; }
+                if (MediaRecorder.isTypeSupported(t)) { 
+                    options = { mimeType: t, videoBitsPerSecond: 2500000 }; 
+                    selectedMimeType = t;
+                    break; 
+                }
             }
 
             try { mediaRecorder = new MediaRecorder(stream, options); } 
-            catch (e) { showToast("Navegador no soporta grabar video."); isRecording = false; return; }
+            catch (e) { showToast("Navegador no soporta grabar video en este formato."); isRecording = false; return; }
 
             mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
             mediaRecorder.onstop = () => {
-                const ext = mediaRecorder.mimeType.includes('mp4') ? 'mp4' : 'webm';
-                const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
+                // Forzar el MimeType correcto basado en la selección al generar el blob
+                const finalMimeType = mediaRecorder.mimeType || selectedMimeType;
+                const ext = finalMimeType.includes('mp4') ? 'mp4' : 'webm';
+                
+                const blob = new Blob(recordedChunks, { type: finalMimeType });
                 const a = document.createElement('a');
-                a.style.display = 'none'; a.href = URL.createObjectURL(blob); a.download = `Grabacion-${Date.now()}.${ext}`;
-                document.body.appendChild(a); a.click(); setTimeout(() => { document.body.removeChild(a); }, 100);
-                showToast("¡Grabación guardada!");
+                a.style.display = 'none'; 
+                a.href = URL.createObjectURL(blob); 
+                a.download = `StreamMaster-${Date.now()}.${ext}`;
+                document.body.appendChild(a); 
+                a.click(); 
+                setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(a.href); }, 100);
+                showToast("¡Grabación guardada correctamente!");
             };
 
-            mediaRecorder.start();
+            // CORRECCIÓN: Guardar partes del video cada 1000ms (1 segundo) 
+            // Esto previene que el video se corrompa entero si hay una pequeña interrupción
+            mediaRecorder.start(1000); 
+            
             startTime = Date.now(); timerInterval = setInterval(updateTimer, 1000);
             timerDisplay.classList.remove('hidden'); btnRecord.classList.add('record-pulse');
             recordIcon.classList.replace('rounded-full', 'rounded-sm');
@@ -627,7 +645,7 @@
 
         function stopRecording() {
             isRecording = false;
-            if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
+            if (animationFrameId) { clearTimeout(animationFrameId); animationFrameId = null; } // CORRECCIÓN: timeout instead of animation frame
             if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
             
             clearInterval(timerInterval); timerDisplay.classList.add('hidden');
