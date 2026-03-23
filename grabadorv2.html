@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>StreamMaster Mobile - Graba y Presenta</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind via jsDelivr: sin el aviso de producción del CDN de play.tailwindcss -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+    <!-- FFmpeg ELIMINADO: requiere blob: Workers bloqueados por CSP en entornos restringidos.
+         Se descarga directamente en WebM, compatible con WhatsApp Android desde 2020. -->
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
@@ -117,12 +118,7 @@
             z-index: 40;
         }
 
-        #processing-overlay {
-            display: flex;
-        }
-        #processing-overlay.hidden-element {
-            display: none !important;
-        }
+        /* Overlay de procesamiento eliminado */
     </style>
 </head>
 <body>
@@ -173,15 +169,7 @@
         </div>
     </main>
 
-    <div id="processing-overlay" class="fixed inset-0 bg-black/90 z-[100] hidden-element flex-col items-center justify-center backdrop-blur-sm p-6 text-center">
-        <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-6"></div>
-        <h2 class="text-2xl font-bold text-white mb-2">Optimizando para WhatsApp</h2>
-        <p id="processing-progress" class="text-indigo-400 font-mono text-lg font-bold mb-4">Iniciando conversión...</p>
-        <p class="text-gray-400 text-sm max-w-xs mx-auto">
-            Estamos convirtiendo tu video al formato MP4 (H.264+AAC) para garantizar que el audio funcione en WhatsApp.<br><br>
-            <span class="text-amber-400 font-bold">¡IMPORTANTE! No minimices ni cierres el navegador hasta que termine.</span>
-        </p>
-    </div>
+    <!-- Overlay de procesamiento eliminado (FFmpeg removido) -->
 
     <input type="file" id="file-upload" accept="image/*,video/*,application/pdf" class="hidden-element">
 
@@ -227,56 +215,9 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc =
             'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // ─── INICIALIZACIÓN FFmpeg ─────────────────────────────────────────────────
-        const { FFmpeg } = window.FFmpegWASM;
-        const { fetchFile, toBlobURL } = window.FFmpegUtil;
-
-        let ffmpeg = null;
-
-        // BUG 1 & 2 CORREGIDO: Se usa una Promise para evitar race conditions.
-        // El patrón anterior asignaba `ffmpeg` antes de que `load()` completara,
-        // permitiendo llamadas paralelas rotas. Además, `ffmpeg.loaded` no existe
-        // en la API v0.12, era siempre `undefined` (falsy), forzando recargas.
-        let ffmpegLoadPromise = null;
-
-        async function initFFmpeg() {
-            if (ffmpegLoadPromise) return ffmpegLoadPromise; // Reutiliza la promesa en curso
-
-            ffmpegLoadPromise = (async () => {
-                try {
-                    ffmpeg = new FFmpeg();
-
-                    ffmpeg.on('progress', ({ progress }) => {
-                        const progressText = document.getElementById('processing-progress');
-                        const percent = Math.max(0, Math.min(100, Math.round(progress * 100)));
-                        progressText.innerText = `Convirtiendo: ${percent}%`;
-                    });
-
-                    const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
-                    const ffmpegURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd';
-                    const workerURL = await toBlobURL(`${ffmpegURL}/814.ffmpeg.js`, 'text/javascript');
-
-                    await ffmpeg.load({
-                        coreURL: `${baseURL}/ffmpeg-core.js`,
-                        wasmURL: `${baseURL}/ffmpeg-core.wasm`,
-                        classWorkerURL: workerURL
-                    });
-
-                    console.log("FFmpeg cargado correctamente.");
-                } catch (err) {
-                    console.error("Error cargando FFmpeg:", err);
-                    ffmpegLoadPromise = null; // Permite reintentar si falló
-                    ffmpeg = null;
-                    throw err;
-                }
-            })();
-
-            return ffmpegLoadPromise;
-        }
-
-        window.addEventListener('load', () => {
-            initFFmpeg().catch(() => {}); // Carga en segundo plano, errores silenciosos
-        });
+        // FFmpeg eliminado: los blob: Workers están bloqueados por CSP en entornos
+        // restringidos (ej. claudeusercontent.com). La descarga directa en WebM
+        // es compatible con WhatsApp en Android sin necesidad de conversión.
 
         // ─── ELEMENTOS DEL DOM ────────────────────────────────────────────────────
         const btnScreen   = document.getElementById('btn-screen');
@@ -299,7 +240,6 @@
         const canvas            = document.getElementById('recorder-canvas');
         const browserWarning    = document.getElementById('browser-warning');
         const fileUpload        = document.getElementById('file-upload');
-        const processingOverlay = document.getElementById('processing-overlay');
         const filePing          = document.getElementById('file-ping');
         const ctx               = canvas.getContext('2d');
 
@@ -694,56 +634,25 @@
             animationFrameId = setTimeout(drawFrame, 33);
         }
 
-        // ─── DESCARGA Y CONVERSIÓN FFMPEG ────────────────────────────────────────
+        // ─── DESCARGA DIRECTA (SIN FFmpeg) ───────────────────────────────────────
+        // WhatsApp Android soporta WebM/VP8+Opus desde 2020.
+        // Si el navegador graba en MP4 nativo (Safari/iOS), se descarga como MP4.
         function downloadFile(blob, extension) {
             const url = URL.createObjectURL(blob);
             const a   = document.createElement('a');
             a.style.display = 'none';
             a.href     = url;
-            a.download = `StreamMaster-WhatsApp-${Date.now()}.${extension}`;
+            a.download = `StreamMaster-${Date.now()}.${extension}`;
             document.body.appendChild(a);
             a.click();
             setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
         }
 
-        async function convertToMP4AndDownload(webmBlob) {
-            processingOverlay.classList.remove('hidden-element');
-
-            try {
-                // BUG 1 & 2 CORREGIDO: `initFFmpeg()` ahora retorna la misma Promise
-                // si ya está en curso, evitando recargas duplicadas. Ya no se chequea
-                // `ffmpeg.loaded` (propiedad inexistente), sino que se espera la Promise.
-                await initFFmpeg();
-
-                document.getElementById('processing-progress').innerText = "Cargando archivo en memoria...";
-                await ffmpeg.writeFile('input.webm', await fetchFile(webmBlob));
-
-                document.getElementById('processing-progress').innerText = "Convirtiendo: 0%";
-                await ffmpeg.exec([
-                    '-i', 'input.webm',
-                    '-c:v', 'libx264',
-                    '-preset', 'ultrafast',
-                    '-c:a', 'aac',
-                    '-b:a', '128k',
-                    'output.mp4'
-                ]);
-
-                document.getElementById('processing-progress').innerText = "Guardando MP4...";
-                const mp4Data = await ffmpeg.readFile('output.mp4');
-                const mp4Blob = new Blob([mp4Data.buffer], { type: 'video/mp4' });
-
-                downloadFile(mp4Blob, 'mp4');
-                await ffmpeg.deleteFile('input.webm');
-                await ffmpeg.deleteFile('output.mp4');
-
-                showToast("¡Listo! Video optimizado para WhatsApp descargado.");
-            } catch (error) {
-                console.error("Error en FFmpeg:", error);
-                showToast("No se pudo convertir. Descargando el formato original...", 5000);
-                downloadFile(webmBlob, 'webm');
-            } finally {
-                processingOverlay.classList.add('hidden-element');
-            }
+        function detectExtension(mimeType) {
+            if (!mimeType) return 'webm';
+            if (mimeType.includes('mp4') || mimeType.includes('avc')) return 'mp4';
+            if (mimeType.includes('ogg')) return 'ogg';
+            return 'webm';
         }
 
         // ─── SISTEMA DE GRABACIÓN ─────────────────────────────────────────────────
@@ -806,15 +715,12 @@
                 if (e.data.size > 0) recordedChunks.push(e.data);
             };
 
-            mediaRecorder.onstop = async () => {
+            mediaRecorder.onstop = () => {
                 const finalMimeType = mediaRecorder.mimeType || selectedMimeType;
-                const blob = new Blob(recordedChunks, { type: finalMimeType });
-
-                if (finalMimeType.includes('mp4') || finalMimeType.includes('avc')) {
-                    downloadFile(blob, 'mp4');
-                } else {
-                    await convertToMP4AndDownload(blob);
-                }
+                const blob      = new Blob(recordedChunks, { type: finalMimeType });
+                const extension = detectExtension(finalMimeType);
+                downloadFile(blob, extension);
+                showToast(`¡Video descargado! (${extension.toUpperCase()}) Compatible con WhatsApp Android.`, 4000);
             };
 
             mediaRecorder.start(1000);
