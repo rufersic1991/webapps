@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StreamMaster Mobile - Graba y Presenta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --bg: #0f172a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .record-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        #camera-bubble {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            position: absolute;
+            bottom: 120px;
+            right: 20px;
+            overflow: hidden;
+            z-index: 50;
+            touch-action: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            background: #000;
+            cursor: grab;
+            transition: border-color 0.3s ease;
+        }
+
+        #camera-bubble:active {
+            cursor: grabbing;
+            border-color: var(--secondary);
+        }
+
+        video#face-cam {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        #main-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: transparent;
+        }
+
+        .hidden-canvas {
+            display: none;
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #818cf8, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Active states for buttons */
+        .btn-active {
+            background-color: rgba(99, 102, 241, 0.3) !important;
+            border: 1px solid var(--primary);
+        }
+        .btn-active i {
+            color: #818cf8 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 w-full z-50 p-4 flex justify-between items-center glass">
+        <div>
+            <h1 class="text-xl font-bold gradient-text">StreamMaster</h1>
+            <p id="status-text" class="text-[10px] uppercase tracking-widest text-gray-400">Listo para grabar</p>
+        </div>
+        <div id="timer" class="text-lg font-mono font-bold hidden">00:00</div>
+    </header>
+
+    <!-- Main Viewport -->
+    <main class="relative w-full h-full flex items-center justify-center bg-[#0f172a]">
+        <!-- Placeholder when nothing is shared -->
+        <div id="placeholder" class="text-center p-8 z-10">
+            <div class="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="smartphone" class="text-indigo-400 w-10 h-10"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">Prepara tu Escena</h2>
+            <p class="text-gray-400 text-sm max-w-xs mx-auto mb-4">Activa micrófono, cámara y pantalla. Al grabar, minimiza para mostrar tu celular.</p>
+            <div id="browser-warning" class="hidden text-xs text-amber-400 bg-amber-900/20 p-2 rounded border border-amber-500/30">
+                Tu navegador podría no soportar compartir pantalla.
+            </div>
+        </div>
+
+        <video id="main-preview" class="z-0" autoplay playsinline muted></video>
+        
+        <!-- Face Cam Bubble -->
+        <div id="camera-bubble" class="hidden">
+            <video id="face-cam" autoplay playsinline muted></video>
+        </div>
+    </main>
+
+    <!-- Controls -->
+    <footer class="fixed bottom-0 left-0 w-full z-50 p-4 glass rounded-t-3xl pb-8">
+        <div class="flex justify-around items-center max-w-md mx-auto">
+            
+            <!-- Toggle Mic -->
+            <button id="btn-mic" class="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-all flex flex-col items-center gap-1 focus:outline-none">
+                <i data-lucide="mic-off" id="mic-icon" class="w-6 h-6 text-white"></i>
+            </button>
+
+            <!-- Toggle Screen -->
+            <button id="btn-screen" class="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-all flex flex-col items-center gap-1 focus:outline-none">
+                <i data-lucide="screen-share" class="w-6 h-6 text-white"></i>
+            </button>
+
+            <!-- Main Record Button -->
+            <button id="btn-record" class="w-20 h-20 mx-2 rounded-full bg-white flex items-center justify-center shadow-xl disabled:opacity-50 transition-all active:scale-95 focus:outline-none">
+                <div id="record-icon" class="w-8 h-8 bg-red-600 rounded-full transition-all"></div>
+            </button>
+
+            <!-- Toggle Camera -->
+            <button id="btn-camera" class="p-4 rounded-full bg-white/10 hover:bg-white/20 transition-all flex flex-col items-center gap-1 focus:outline-none">
+                <i data-lucide="camera" class="w-6 h-6 text-white"></i>
+            </button>
+
+        </div>
+    </footer>
+
+    <!-- Off-screen Canvas for Processing -->
+    <canvas id="recorder-canvas" class="hidden-canvas"></canvas>
+
+    <!-- Notification / Toast -->
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 glass px-6 py-3 rounded-full text-sm font-medium opacity-0 transition-opacity z-[100] pointer-events-none text-center max-w-[90%] shadow-lg">
+        Mensaje aquí
+    </div>
+
+    <script>
+        // DOM Elements
+        const btnScreen = document.getElementById('btn-screen');
+        const btnCamera = document.getElementById('btn-camera');
+        const btnMic = document.getElementById('btn-mic');
+        const btnRecord = document.getElementById('btn-record');
+        const recordIcon = document.getElementById('record-icon');
+        const micIcon = document.getElementById('mic-icon');
+        const faceCam = document.getElementById('face-cam');
+        const mainPreview = document.getElementById('main-preview');
+        const cameraBubble = document.getElementById('camera-bubble');
+        const placeholder = document.getElementById('placeholder');
+        const statusText = document.getElementById('status-text');
+        const timerDisplay = document.getElementById('timer');
+        const toast = document.getElementById('toast');
+        const canvas = document.getElementById('recorder-canvas');
+        const browserWarning = document.getElementById('browser-warning');
+        const ctx = canvas.getContext('2d');
+
+        // State
+        let screenStream = null;
+        let cameraStream = null;
+        let micStream = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecording = false;
+        let startTime = 0;
+        let timerInterval = null;
+        let animationFrameId = null;
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Environment Check
+        window.onload = () => {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+                browserWarning.classList.remove('hidden');
+            }
+        };
+
+        // Notification Helper
+        let toastTimeout;
+        function showToast(msg, duration = 3000) {
+            clearTimeout(toastTimeout);
+            toast.innerText = msg;
+            toast.style.opacity = '1';
+            toastTimeout = setTimeout(() => { toast.style.opacity = '0'; }, duration);
+        }
+
+        // Timer Helper
+        function updateTimer() {
+            const now = Date.now();
+            const diff = new Date(now - startTime);
+            const mins = String(diff.getUTCMinutes()).padStart(2, '0');
+            const secs = String(diff.getUTCSeconds()).padStart(2, '0');
+            timerDisplay.innerText = `${mins}:${secs}`;
+        }
+
+        // Dragging logic for Camera Bubble (Touch & Mouse support)
+        let isDragging = false;
+        let currentX, currentY, initialX, initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        cameraBubble.addEventListener("touchstart", dragStart, {passive: false});
+        cameraBubble.addEventListener("touchend", dragEnd, false);
+        cameraBubble.addEventListener("touchmove", drag, {passive: false});
+        
+        cameraBubble.addEventListener("mousedown", dragStart, false);
+        document.addEventListener("mouseup", dragEnd, false);
+        document.addEventListener("mousemove", drag, false);
+
+        function dragStart(e) {
+            if (e.type === "touchstart") {
+                initialX = e.touches[0].clientX - xOffset;
+                initialY = e.touches[0].clientY - yOffset;
+            } else {
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+            }
+
+            if (e.target === cameraBubble || cameraBubble.contains(e.target)) {
+                isDragging = true;
+            }
+        }
+
+        function dragEnd() {
+            initialX = currentX;
+            initialY = currentY;
+            isDragging = false;
+        }
+
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault(); // Evita scroll en móviles
+                if (e.type === "touchmove") {
+                    currentX = e.touches[0].clientX - initialX;
+                    currentY = e.touches[0].clientY - initialY;
+                } else {
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                }
+                xOffset = currentX;
+                yOffset = currentY;
+                setTranslate(currentX, currentY, cameraBubble);
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+        }
+
+        // --- MEDIA MANAGEMENT ---
+
+        async function toggleMic() {
+            if (micStream) {
+                micStream.getTracks().forEach(t => t.stop());
+                micStream = null;
+                btnMic.classList.remove('btn-active');
+                micIcon.setAttribute('data-lucide', 'mic-off');
+                lucide.createIcons();
+                showToast("Micrófono desactivado");
+            } else {
+                try {
+                    micStream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            sampleRate: 44100
+                        }
+                    });
+                    btnMic.classList.add('btn-active');
+                    micIcon.setAttribute('data-lucide', 'mic');
+                    lucide.createIcons();
+                    showToast("Micrófono activo. Tu voz se grabará.");
+                } catch (err) {
+                    if (err.name === 'NotAllowedError') showToast("Permiso de micrófono denegado.");
+                    else showToast("Error al acceder al micrófono.");
+                    console.error(err);
+                }
+            }
+        }
+
+        async function toggleCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+                faceCam.srcObject = null;
+                cameraBubble.classList.add('hidden');
+                btnCamera.classList.remove('btn-active');
+                showToast("Cámara desactivada");
+            } else {
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 720 } },
+                        audio: false 
+                    });
+                    faceCam.srcObject = cameraStream;
+                    cameraBubble.classList.remove('hidden');
+                    btnCamera.classList.add('btn-active');
+                    showToast("Cámara frontal activa");
+                } catch (err) {
+                    if (err.name === 'NotAllowedError') showToast("Permiso de cámara denegado.");
+                    else showToast("Error al acceder a la cámara.");
+                    console.error(err);
+                }
+            }
+        }
+
+        async function toggleScreen() {
+            if (!navigator.mediaDevices.getDisplayMedia) {
+                showToast("Tu navegador no soporta capturar pantalla.");
+                return;
+            }
+
+            if (screenStream) {
+                screenStream.getTracks().forEach(t => t.stop());
+                screenStream = null;
+                mainPreview.srcObject = null;
+                if(!isRecording) placeholder.classList.remove('hidden');
+                btnScreen.classList.remove('btn-active');
+                showToast("Pantalla desconectada");
+            } else {
+                try {
+                    screenStream = await navigator.mediaDevices.getDisplayMedia({ 
+                        video: { 
+                            displaySurface: "monitor",
+                            cursor: "always" 
+                        },
+                        audio: false // El audio lo gestiona el micrófono
+                    });
+                    mainPreview.srcObject = screenStream;
+                    placeholder.classList.add('hidden');
+                    btnScreen.classList.add('btn-active');
+                    showToast("¡Pantalla lista! Ahora puedes minimizar el navegador para mostrar tu celular.", 5000);
+                    
+                    screenStream.getVideoTracks()[0].onended = () => {
+                        if(screenStream) toggleScreen();
+                    };
+                } catch (err) {
+                    if (err.name === 'NotAllowedError') showToast("Captura de pantalla cancelada.");
+                    else showToast("Error al capturar la pantalla.");
+                    console.error(err);
+                }
+            }
+        }
+
+        // Compositing & Recording
+        function drawFrame() {
+            if (!isRecording) return;
+
+            // Define canvas dimensions based on screen share or HD fallback
+            const width = screenStream ? mainPreview.videoWidth : 1280;
+            const height = screenStream ? mainPreview.videoHeight : 720;
+            
+            if (width === 0 || height === 0) {
+                animationFrameId = requestAnimationFrame(drawFrame);
+                return;
+            }
+
+            if (canvas.width !== width) {
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            // 1. Draw Background
+            ctx.fillStyle = "#0f172a";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            if (screenStream && mainPreview.readyState === 4) {
+                ctx.drawImage(mainPreview, 0, 0, canvas.width, canvas.height);
+            } else if (!screenStream) {
+                // Background pattern if no screen is shared
+                ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+                ctx.font = "bold 40px Inter, sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("MODO CÁMARA", canvas.width / 2, canvas.height / 2);
+            }
+
+            // 2. Draw Face Cam Overlay (Circle)
+            if (cameraStream && faceCam.readyState === 4) {
+                const isOnlyCamera = !screenStream;
+                const bubbleSize = isOnlyCamera ? Math.min(canvas.width, canvas.height) * 0.6 : Math.max(150, canvas.width * 0.20); 
+                const padding = isOnlyCamera ? 0 : 30;
+                
+                // Position: Centered if only camera, bottom-right if screen sharing
+                const x = isOnlyCamera ? (canvas.width - bubbleSize) / 2 : canvas.width - bubbleSize - padding;
+                const y = isOnlyCamera ? (canvas.height - bubbleSize) / 2 : canvas.height - bubbleSize - padding;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(x + bubbleSize/2, y + bubbleSize/2, bubbleSize/2, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+                
+                // Mirror the camera on canvas
+                ctx.translate(x + bubbleSize, y);
+                ctx.scale(-1, 1);
+                ctx.drawImage(faceCam, 0, 0, bubbleSize, bubbleSize);
+                ctx.restore();
+                
+                // Border
+                ctx.strokeStyle = "#6366f1";
+                ctx.lineWidth = Math.max(3, canvas.width * 0.005);
+                ctx.stroke();
+            }
+
+            animationFrameId = requestAnimationFrame(drawFrame);
+        }
+
+        async function startRecording() {
+            if (!screenStream && !cameraStream) {
+                showToast("Activa al menos la cámara o la pantalla para grabar");
+                return;
+            }
+
+            if (!micStream) {
+                showToast("Activando micrófono para tu voz...");
+                await toggleMic();
+            }
+
+            placeholder.classList.add('hidden'); // Ocultar siempre al grabar
+            recordedChunks = [];
+            isRecording = true;
+
+            const stream = canvas.captureStream(30);
+            
+            if (micStream && micStream.getAudioTracks().length > 0) {
+                stream.addTrack(micStream.getAudioTracks()[0]);
+            }
+
+            // Fallback strategy for codecs
+            const types = [
+                'video/webm;codecs=vp9,opus',
+                'video/webm;codecs=vp8,opus',
+                'video/webm',
+                'video/mp4'
+            ];
+            
+            let options = {};
+            for (let t of types) {
+                if (MediaRecorder.isTypeSupported(t)) {
+                    options = { mimeType: t, videoBitsPerSecond: 2500000 }; // 2.5 Mbps ideal
+                    break;
+                }
+            }
+
+            try {
+                mediaRecorder = new MediaRecorder(stream, options);
+            } catch (e) {
+                console.error("Error MediaRecorder:", e);
+                showToast("Tu navegador no soporta grabar video en este formato.");
+                isRecording = false;
+                return;
+            }
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blobType = mediaRecorder.mimeType.includes('mp4') ? 'video/mp4' : 'video/webm';
+                const extension = mediaRecorder.mimeType.includes('mp4') ? 'mp4' : 'webm';
+                
+                const blob = new Blob(recordedChunks, { type: blobType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `StreamMaster-${Date.now()}.${extension}`;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+                showToast("¡Grabación guardada con éxito!");
+            };
+
+            // UI
+            mediaRecorder.start();
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+            timerDisplay.classList.remove('hidden');
+            btnRecord.classList.add('record-pulse');
+            recordIcon.classList.replace('rounded-full', 'rounded-sm');
+            statusText.innerText = screenStream ? "Grabando... (Minimiza el navegador)" : "Grabando...";
+            statusText.classList.add('text-red-500');
+
+            drawFrame();
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            if(mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            clearInterval(timerInterval);
+            timerDisplay.classList.add('hidden');
+            btnRecord.classList.remove('record-pulse');
+            recordIcon.classList.replace('rounded-sm', 'rounded-full');
+            statusText.innerText = "Listo para grabar";
+            statusText.classList.remove('text-red-500');
+            
+            if (!screenStream) placeholder.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        btnMic.onclick = toggleMic;
+        btnCamera.onclick = toggleCamera;
+        btnScreen.onclick = toggleScreen;
+        btnRecord.onclick = () => {
+            if (isRecording) stopRecording();
+            else startRecording();
+        };
+
+    </script>
+</body>
+</html>
