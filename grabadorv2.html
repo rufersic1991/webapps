@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>StreamMaster Mobile - Graba y Presenta</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- PDF.js library -->
+    
+    <!-- Librería PDF.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
+    <!-- Librerías FFmpeg.wasm para conversión a MP4 compatible con WhatsApp -->
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
@@ -79,7 +84,7 @@
             background: transparent;
         }
 
-        /* Contenedores multimedia (Ocultos a la vista, se dibujan en el canvas o se muestran bajo demanda) */
+        /* Contenedores multimedia */
         .media-layer {
             width: 100%;
             height: 100%;
@@ -101,12 +106,12 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Active states for buttons */
+        /* Estados activos para los botones */
         .btn-active {
             background-color: rgba(99, 102, 241, 0.3) !important;
             border: 1px solid var(--primary);
         }
-        .btn-active i {
+        .btn-active svg {
             color: #818cf8 !important;
         }
 
@@ -118,11 +123,19 @@
             transform: translateY(-50%);
             z-index: 40;
         }
+
+        /* Pantalla de carga FFmpeg */
+        #processing-overlay {
+            display: flex;
+        }
+        #processing-overlay.hidden-element {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- Encabezado -->
     <header class="fixed top-0 left-0 w-full z-50 p-4 flex justify-between items-center glass">
         <div>
             <h1 class="text-xl font-bold gradient-text">StreamMaster</h1>
@@ -131,17 +144,24 @@
         <div id="timer" class="text-lg font-mono font-bold hidden">00:00</div>
     </header>
 
-    <!-- Main Viewport -->
+    <!-- Vista Principal -->
     <main class="relative w-full h-full flex items-center justify-center bg-[#0f172a]">
-        <!-- Placeholder -->
+        <!-- Pantalla de inicio -->
         <div id="placeholder" class="text-center p-8 z-10">
             <div class="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="file-plus-2" class="text-indigo-400 w-10 h-10"></i>
+                <!-- Ícono SVG Nativo: File Plus -->
+                <svg class="w-10 h-10 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M3 15h6"/><path d="M6 12v6"/>
+                </svg>
             </div>
             <h2 class="text-2xl font-bold mb-2">Sube tu Archivo</h2>
             <p class="text-gray-400 text-sm max-w-xs mx-auto mb-4">Sube un PDF, una imagen o un video para usarlo como presentación. Activa tu cámara y graba.</p>
-            <div id="browser-warning" class="hidden text-xs text-amber-400 bg-amber-900/20 p-3 rounded border border-amber-500/30 max-w-sm mx-auto">
-                <p class="font-bold mb-1"><i data-lucide="alert-triangle" class="w-4 h-4 inline mb-1"></i> Sin compartir pantalla</p>
+            <div id="browser-warning" class="hidden-element text-xs text-amber-400 bg-amber-900/20 p-3 rounded border border-amber-500/30 max-w-sm mx-auto">
+                <p class="font-bold mb-1">
+                    <!-- Ícono SVG Nativo: Alert Triangle -->
+                    <svg class="w-4 h-4 inline mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                    Pantalla bloqueada por el móvil
+                </p>
                 Usa el botón de <strong>Archivo</strong> abajo para cargar tu presentación PDF directamente.
             </div>
         </div>
@@ -152,7 +172,7 @@
         <video id="video-preview" class="hidden-element media-layer" playsinline loop muted></video> <!-- Para Video subido -->
         <canvas id="pdf-preview" class="hidden-element media-layer"></canvas> <!-- Para renderizar PDF -->
         
-        <!-- Face Cam Bubble -->
+        <!-- Burbuja de la Cámara -->
         <div id="camera-bubble" class="hidden-element">
             <video id="face-cam" autoplay playsinline muted></video>
         </div>
@@ -160,67 +180,115 @@
         <!-- Controles PDF Flotantes -->
         <div id="pdf-controls" class="hidden-element flex flex-col gap-3 glass p-2 rounded-full shadow-lg">
             <button id="btn-prev-page" class="p-3 bg-indigo-600 hover:bg-indigo-500 rounded-full text-white transition-colors">
-                <i data-lucide="chevron-up" class="w-6 h-6"></i>
+                <!-- Ícono SVG Nativo: Chevron Up -->
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
             </button>
             <span id="pdf-page-num" class="text-white text-center text-xs font-bold py-1">1/1</span>
             <button id="btn-next-page" class="p-3 bg-indigo-600 hover:bg-indigo-500 rounded-full text-white transition-colors">
-                <i data-lucide="chevron-down" class="w-6 h-6"></i>
+                <!-- Ícono SVG Nativo: Chevron Down -->
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             </button>
         </div>
     </main>
 
-    <!-- Hidden File Input for Docs/Media -->
+    <!-- Overlay de Procesamiento (FFmpeg) -->
+    <div id="processing-overlay" class="fixed inset-0 bg-black/90 z-[100] hidden-element flex-col items-center justify-center backdrop-blur-sm p-6 text-center">
+        <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+        <h2 class="text-2xl font-bold text-white mb-2">Optimizando para WhatsApp</h2>
+        <p id="processing-progress" class="text-indigo-400 font-mono text-lg font-bold mb-4">Iniciando conversión...</p>
+        <p class="text-gray-400 text-sm max-w-xs mx-auto">
+            Estamos convirtiendo tu video al formato MP4 (H.264+AAC) para garantizar que el audio funcione en WhatsApp.<br><br>
+            <span class="text-amber-400 font-bold">¡IMPORTANTE! No minimices ni cierres el navegador hasta que termine.</span>
+        </p>
+    </div>
+
+    <!-- Input Oculto para Archivos -->
     <input type="file" id="file-upload" accept="image/*,video/*,application/pdf" class="hidden-element">
 
-    <!-- Controls -->
+    <!-- Controles Inferiores -->
     <footer class="fixed bottom-0 left-0 w-full z-50 p-4 glass rounded-t-3xl pb-8">
         <div class="flex justify-between items-center max-w-md mx-auto px-1 sm:px-4">
             
-            <!-- Toggle Mic -->
+            <!-- Botón Micrófono -->
             <button id="btn-mic" class="p-3 sm:p-4 rounded-full bg-white/10 hover:bg-white/20 transition-all flex flex-col items-center gap-1 focus:outline-none">
-                <i data-lucide="mic-off" id="mic-icon" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
+                <!-- Ícono SVG Nativo: Mic Off (Defecto) -->
+                <svg id="icon-mic-off" class="w-5 h-5 sm:w-6 sm:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="22" y1="2" y2="22"></line><path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"></path><path d="M5 10v2a7 7 0 0 0 12 5l-1.5 1.5a5 5 0 0 1-9-5v-2"></path><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+                <!-- Ícono SVG Nativo: Mic On (Oculto) -->
+                <svg id="icon-mic-on" class="w-5 h-5 sm:w-6 sm:h-6 text-white hidden-element" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
             </button>
 
-            <!-- Toggle Screen (Native) -->
+            <!-- Botón Pantalla (Nativa) -->
             <button id="btn-screen" class="p-3 sm:p-4 rounded-full bg-white/10 hover:bg-white/20 transition-all flex flex-col items-center gap-1 focus:outline-none">
-                <i data-lucide="screen-share" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
+                <!-- Ícono SVG Nativo: Monitor Up -->
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 10 3-3 3 3"/><path d="M12 7v8"/><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M12 17v4"/><path d="M8 21h8"/></svg>
             </button>
 
-            <!-- Main Record Button -->
+            <!-- Botón Principal de Grabación -->
             <button id="btn-record" class="w-16 h-16 sm:w-20 sm:h-20 mx-1 sm:mx-2 flex-shrink-0 rounded-full bg-white flex items-center justify-center shadow-xl disabled:opacity-50 transition-all active:scale-95 focus:outline-none">
                 <div id="record-icon" class="w-6 h-6 sm:w-8 sm:h-8 bg-red-600 rounded-full transition-all"></div>
             </button>
 
-            <!-- Upload File (PDF/Image/Video) -->
+            <!-- Botón Subir Archivo (PDF/Imagen/Video) -->
             <button id="btn-file" class="p-3 sm:p-4 rounded-full bg-white/10 hover:bg-white/20 transition-all flex flex-col items-center gap-1 focus:outline-none relative">
-                <i data-lucide="folder-open" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
+                <!-- Ícono SVG Nativo: Folder Open -->
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2"></path></svg>
                 <span class="absolute -top-1 -right-1 flex h-3 w-3">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
                 </span>
             </button>
 
-            <!-- Toggle Camera -->
+            <!-- Botón Cámara -->
             <button id="btn-camera" class="p-3 sm:p-4 rounded-full bg-white/10 hover:bg-white/20 transition-all flex flex-col items-center gap-1 focus:outline-none">
-                <i data-lucide="camera" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
+                <!-- Ícono SVG Nativo: Camera -->
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
             </button>
 
         </div>
     </footer>
 
-    <!-- Off-screen Canvas for Processing -->
+    <!-- Canvas de Procesamiento Oculto -->
     <canvas id="recorder-canvas" class="hidden-element"></canvas>
 
-    <!-- Notification / Toast -->
+    <!-- Notificaciones (Toast) -->
     <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 glass px-6 py-3 rounded-full text-sm font-medium opacity-0 transition-opacity z-[100] pointer-events-none text-center max-w-[90%] shadow-lg">
         Mensaje aquí
     </div>
 
     <script>
-        // Configurar worker de PDF.js
+        // --- INICIALIZACIÓN DE LIBRERÍAS (PDF.js y FFmpeg) ---
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // DOM Elements
+        const { FFmpeg } = window.FFmpeg;
+        const { fetchFile } = window.FFmpegUtil;
+        let ffmpeg = null;
+
+        async function initFFmpeg() {
+            if (ffmpeg) return;
+            try {
+                ffmpeg = new FFmpeg();
+                
+                ffmpeg.on('progress', ({ progress, time }) => {
+                    const progressText = document.getElementById('processing-progress');
+                    // FFmpeg devuelve un float de 0 a 1
+                    const percent = Math.max(0, Math.min(100, Math.round(progress * 100)));
+                    progressText.innerText = `Convirtiendo: ${percent}%`;
+                });
+
+                // Versión single-threaded para evitar problemas con cabeceras de servidor en GitHub Pages
+                await ffmpeg.load({
+                    coreURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js',
+                    wasmURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm'
+                });
+                console.log("FFmpeg cargado correctamente");
+            } catch (err) {
+                console.error("Error cargando FFmpeg:", err);
+            }
+        }
+        // Cargar FFmpeg de fondo apenas carga la página
+        window.addEventListener('load', initFFmpeg);
+
+        // --- Elementos del DOM ---
         const btnScreen = document.getElementById('btn-screen');
         const btnCamera = document.getElementById('btn-camera');
         const btnMic = document.getElementById('btn-mic');
@@ -228,7 +296,8 @@
         const btnFile = document.getElementById('btn-file');
         
         const recordIcon = document.getElementById('record-icon');
-        const micIcon = document.getElementById('mic-icon');
+        const iconMicOff = document.getElementById('icon-mic-off');
+        const iconMicOn = document.getElementById('icon-mic-on');
         
         const faceCam = document.getElementById('face-cam');
         const cameraBubble = document.getElementById('camera-bubble');
@@ -240,9 +309,10 @@
         const canvas = document.getElementById('recorder-canvas');
         const browserWarning = document.getElementById('browser-warning');
         const fileUpload = document.getElementById('file-upload');
+        const processingOverlay = document.getElementById('processing-overlay');
         const ctx = canvas.getContext('2d');
 
-        // Multimedia Elements
+        // Elementos Multimedia
         const mainPreview = document.getElementById('main-preview'); // Screen Share
         const imagePreview = document.getElementById('image-preview'); // Imagen
         const videoPreview = document.getElementById('video-preview'); // Video subido
@@ -251,7 +321,7 @@
         const pdfControls = document.getElementById('pdf-controls');
         const pdfPageNum = document.getElementById('pdf-page-num');
 
-        // State
+        // Estado Global
         let screenStream = null;
         let cameraStream = null;
         let micStream = null;
@@ -262,28 +332,25 @@
         let timerInterval = null;
         let animationFrameId = null;
 
-        // Current Media Source Tracking
-        let currentMediaElement = null; // El elemento actual que se dibujará de fondo (video, img, o pdfPreview)
-        let currentMediaType = null; // 'screen', 'image', 'video', 'pdf'
+        // Rastreo de Multimedia Actual
+        let currentMediaElement = null; 
+        let currentMediaType = null; 
 
-        // PDF State
+        // Estado del PDF
         let pdfDoc = null;
         let pageNum = 1;
         let pageRendering = false;
         let pageNumPending = null;
 
-        // Initialize Lucide Icons
-        lucide.createIcons();
-
-        // Environment Check
-        window.onload = () => {
+        // Chequeo de Entorno para Compartir Pantalla
+        window.addEventListener('load', () => {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
                 browserWarning.classList.remove('hidden-element');
                 btnScreen.style.display = 'none'; 
             }
-        };
+        });
 
-        // Notification Helper
+        // Helper para Notificaciones
         let toastTimeout;
         function showToast(msg, duration = 3000) {
             clearTimeout(toastTimeout);
@@ -292,7 +359,7 @@
             toastTimeout = setTimeout(() => { toast.style.opacity = '0'; }, duration);
         }
 
-        // Timer Helper
+        // Helper del Temporizador
         function updateTimer() {
             const now = Date.now();
             const diff = new Date(now - startTime);
@@ -301,7 +368,7 @@
             timerDisplay.innerText = `${mins}:${secs}`;
         }
 
-        // --- DRAG LOGIC PARA CAMARA ---
+        // --- LÓGICA DE ARRASTRE PARA LA CÁMARA (Mouse y Táctil) ---
         let isDragging = false;
         let currentX, currentY, initialX, initialY;
         let xOffset = 0;
@@ -367,14 +434,12 @@
             const url = URL.createObjectURL(file);
             const type = file.type;
             
-            // Limpiar capa anterior
-            if (screenStream) toggleScreen(); // Apagar pantalla si estaba compartida
+            if (screenStream) toggleScreen(); 
             hideAllMediaLayers();
             placeholder.classList.add('hidden-element');
             btnFile.classList.add('btn-active');
 
             if (type.startsWith('image/')) {
-                // --- MODO IMAGEN ---
                 imagePreview.src = url;
                 imagePreview.onload = () => {
                     imagePreview.classList.remove('hidden-element');
@@ -384,7 +449,6 @@
                 };
             } 
             else if (type.startsWith('video/')) {
-                // --- MODO VIDEO ---
                 videoPreview.src = url;
                 videoPreview.onloadeddata = () => {
                     videoPreview.classList.remove('hidden-element');
@@ -395,7 +459,6 @@
                 };
             } 
             else if (type === 'application/pdf') {
-                // --- MODO PDF ---
                 showToast("Procesando PDF...");
                 try {
                     pdfDoc = await pdfjsLib.getDocument(url).promise;
@@ -421,8 +484,6 @@
         async function renderPage(num) {
             pageRendering = true;
             const page = await pdfDoc.getPage(num);
-            
-            // Resolucion de renderizado (Escala 2 para buena calidad)
             const viewport = page.getViewport({ scale: 2.0 });
             pdfPreview.height = viewport.height;
             pdfPreview.width = viewport.width;
@@ -452,18 +513,22 @@
         };
 
 
-        // --- MANEJO DE CAMARA, MIC Y PANTALLA ---
+        // --- MANEJO DE CÁMARA, MIC Y PANTALLA ---
 
         async function toggleMic() {
             if (micStream) {
                 micStream.getTracks().forEach(t => t.stop()); micStream = null;
-                btnMic.classList.remove('btn-active'); micIcon.setAttribute('data-lucide', 'mic-off');
-                lucide.createIcons(); showToast("Micrófono desactivado");
+                btnMic.classList.remove('btn-active');
+                iconMicOff.classList.remove('hidden-element');
+                iconMicOn.classList.add('hidden-element');
+                showToast("Micrófono desactivado");
             } else {
                 try {
                     micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }});
-                    btnMic.classList.add('btn-active'); micIcon.setAttribute('data-lucide', 'mic');
-                    lucide.createIcons(); showToast("Micrófono activo.");
+                    btnMic.classList.add('btn-active'); 
+                    iconMicOff.classList.add('hidden-element');
+                    iconMicOn.classList.remove('hidden-element');
+                    showToast("Micrófono activo.");
                 } catch (err) { showToast("Error de micrófono."); }
             }
         }
@@ -492,7 +557,7 @@
             } else {
                 try {
                     screenStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: "monitor" }, audio: false });
-                    hideAllMediaLayers(); // Apagar otras capas (PDF/IMG)
+                    hideAllMediaLayers(); 
                     btnFile.classList.remove('btn-active');
                     
                     mainPreview.srcObject = screenStream;
@@ -511,23 +576,19 @@
             }
         }
 
-        // --- MOTOR DE RENDERIZADO (El cerebro del Canvas) ---
+        // --- MOTOR DE RENDERIZADO DEL CANVAS ---
         function drawFrame() {
             if (!isRecording) return;
 
-            // Determinar dimensiones del lienzo base (1280x720 por defecto)
             const width = 1280;
             const height = 720;
             
             if (canvas.width !== width) { canvas.width = width; canvas.height = height; }
 
-            // 1. Dibujar Fondo Negro
             ctx.fillStyle = "#0f172a";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // 2. Dibujar Elemento Multimedia (Pantalla, Imagen, Video, PDF)
             if (currentMediaElement && (currentMediaType !== 'screen' || mainPreview.readyState === 4)) {
-                
                 let sourceWidth, sourceHeight;
                 
                 if (currentMediaType === 'image') { sourceWidth = currentMediaElement.naturalWidth; sourceHeight = currentMediaElement.naturalHeight; }
@@ -535,7 +596,6 @@
                 else { sourceWidth = currentMediaElement.videoWidth; sourceHeight = currentMediaElement.videoHeight; }
 
                 if (sourceWidth && sourceHeight) {
-                    // Mantener Aspect Ratio (Letterboxing)
                     const canvasRatio = canvas.width / canvas.height;
                     const mediaRatio = sourceWidth / sourceHeight;
                     let drawWidth = canvas.width; let drawHeight = canvas.height;
@@ -551,12 +611,10 @@
                     ctx.drawImage(currentMediaElement, offsetX, offsetY, drawWidth, drawHeight);
                 }
             } else if (!currentMediaElement) {
-                // Modo "Solo Cámara"
                 ctx.fillStyle = "rgba(255, 255, 255, 0.05)"; ctx.font = "bold 40px Inter"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
                 ctx.fillText("MODO CÁMARA", canvas.width / 2, canvas.height / 2);
             }
 
-            // 3. Dibujar Burbuja de Cámara
             if (cameraStream && faceCam.readyState === 4) {
                 const isOnlyCamera = !currentMediaElement;
                 const bubbleSize = isOnlyCamera ? Math.min(canvas.width, canvas.height) * 0.6 : Math.max(150, canvas.width * 0.20); 
@@ -571,7 +629,6 @@
                 ctx.closePath();
                 ctx.clip();
                 
-                // Espejo
                 ctx.translate(x + bubbleSize, y);
                 ctx.scale(-1, 1);
                 ctx.drawImage(faceCam, 0, 0, bubbleSize, bubbleSize);
@@ -580,10 +637,65 @@
                 ctx.strokeStyle = "#6366f1"; ctx.lineWidth = Math.max(3, canvas.width * 0.005); ctx.stroke();
             }
 
-            // CORRECCIÓN: Usar setTimeout en lugar de requestAnimationFrame para asegurar fotogramas
-            // incluso si el usuario minimiza el navegador (Mobile-Friendly)
-            animationFrameId = setTimeout(drawFrame, 33); // Aprox 30 FPS constantes
+            animationFrameId = setTimeout(drawFrame, 33); 
         }
+
+        // --- FUNCIONES DE DESCARGA Y CONVERSIÓN FFMPEG ---
+        
+        function downloadFile(blob, extension) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none'; 
+            a.href = url; 
+            a.download = `StreamMaster-WhatsApp-${Date.now()}.${extension}`;
+            document.body.appendChild(a); 
+            a.click(); 
+            setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 100);
+        }
+
+        async function convertToMP4AndDownload(webmBlob) {
+            processingOverlay.classList.remove('hidden-element');
+            
+            try {
+                if (!ffmpeg) await initFFmpeg();
+                if (!ffmpeg.loaded) await ffmpeg.load();
+
+                // 1. Escribir WebM en la memoria virtual
+                document.getElementById('processing-progress').innerText = "Cargando archivo en memoria...";
+                await ffmpeg.writeFile('input.webm', await fetchFile(webmBlob));
+                
+                // 2. Ejecutar conversión de video a MP4 (H.264 para video, AAC para audio)
+                document.getElementById('processing-progress').innerText = "Convirtiendo: 0%";
+                await ffmpeg.exec([
+                    '-i', 'input.webm', 
+                    '-c:v', 'libx264', 
+                    '-preset', 'ultrafast', 
+                    '-c:a', 'aac', 
+                    '-b:a', '128k',
+                    'output.mp4'
+                ]);
+
+                // 3. Leer archivo procesado
+                document.getElementById('processing-progress').innerText = "Guardando MP4...";
+                const mp4Data = await ffmpeg.readFile('output.mp4');
+                const mp4Blob = new Blob([mp4Data.buffer], { type: 'video/mp4' });
+                
+                // 4. Descargar y limpiar
+                downloadFile(mp4Blob, 'mp4');
+                await ffmpeg.deleteFile('input.webm');
+                await ffmpeg.deleteFile('output.mp4');
+                
+                showToast("¡Listo! Video optimizado para WhatsApp descargado.");
+            } catch (error) {
+                console.error("Error en FFmpeg:", error);
+                showToast("No se pudo convertir. Descargando el formato original...", 5000);
+                // Fallback de seguridad: Descargar el WebM original si la conversión falla
+                downloadFile(webmBlob, 'webm');
+            } finally {
+                processingOverlay.classList.add('hidden-element');
+            }
+        }
+
 
         // --- SISTEMA DE GRABACIÓN ---
         async function startRecording() {
@@ -598,10 +710,9 @@
             const stream = canvas.captureStream(30);
             if (micStream && micStream.getAudioTracks().length > 0) stream.addTrack(micStream.getAudioTracks()[0]);
 
-            // Configurar MediaRecorder de manera más segura y compatible (Especial para móviles)
-            const types = ['video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+            const types = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
             let options = {};
-            let selectedMimeType = 'video/webm'; // Fallback por defecto
+            let selectedMimeType = 'video/webm';
             
             for (let t of types) {
                 if (MediaRecorder.isTypeSupported(t)) { 
@@ -612,27 +723,21 @@
             }
 
             try { mediaRecorder = new MediaRecorder(stream, options); } 
-            catch (e) { showToast("Navegador no soporta grabar video en este formato."); isRecording = false; return; }
+            catch (e) { showToast("Error al iniciar el grabador."); isRecording = false; return; }
 
             mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
-            mediaRecorder.onstop = () => {
-                // Forzar el MimeType correcto basado en la selección al generar el blob
+            
+            mediaRecorder.onstop = async () => {
                 const finalMimeType = mediaRecorder.mimeType || selectedMimeType;
-                const ext = finalMimeType.includes('mp4') ? 'mp4' : 'webm';
-                
                 const blob = new Blob(recordedChunks, { type: finalMimeType });
-                const a = document.createElement('a');
-                a.style.display = 'none'; 
-                a.href = URL.createObjectURL(blob); 
-                a.download = `StreamMaster-${Date.now()}.${ext}`;
-                document.body.appendChild(a); 
-                a.click(); 
-                setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(a.href); }, 100);
-                showToast("¡Grabación guardada correctamente!");
+                
+                if (finalMimeType.includes('mp4') || finalMimeType.includes('avc')) {
+                    downloadFile(blob, 'mp4');
+                } else {
+                    await convertToMP4AndDownload(blob);
+                }
             };
 
-            // CORRECCIÓN: Guardar partes del video cada 1000ms (1 segundo) 
-            // Esto previene que el video se corrompa entero si hay una pequeña interrupción
             mediaRecorder.start(1000); 
             
             startTime = Date.now(); timerInterval = setInterval(updateTimer, 1000);
@@ -645,7 +750,7 @@
 
         function stopRecording() {
             isRecording = false;
-            if (animationFrameId) { clearTimeout(animationFrameId); animationFrameId = null; } // CORRECCIÓN: timeout instead of animation frame
+            if (animationFrameId) { clearTimeout(animationFrameId); animationFrameId = null; } 
             if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
             
             clearInterval(timerInterval); timerDisplay.classList.add('hidden');
@@ -655,7 +760,7 @@
             if (!currentMediaElement) placeholder.classList.remove('hidden-element');
         }
 
-        // Event Listeners restaurados
+        // Event Listeners Mapeados
         btnMic.onclick = toggleMic;
         btnCamera.onclick = toggleCamera;
         btnScreen.onclick = toggleScreen;
