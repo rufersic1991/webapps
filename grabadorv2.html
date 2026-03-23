@@ -637,7 +637,10 @@
             if (!currentMediaElement) placeholder.classList.remove('hidden-element');
         }
 
-        // Event Listeners
+        // Event Listeners restaurados
+        btnMic.onclick = toggleMic;
+        btnCamera.onclick = toggleCamera;
+        btnScreen.onclick = toggleScreen;
         btnRecord.onclick = () => { isRecording ? stopRecording() : startRecording(); };
 
     </script>
